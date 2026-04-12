@@ -3,77 +3,132 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>夏夏的留言板</title>
-  <meta name="description" content="夏夏的公共留言板 — 欢迎留言" />
+  <title>夏夏的小世界</title>
+  <meta name="description" content="一个安静的角落" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" sizes="32x32" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 
-  <!-- ===== Navigation ===== -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-content">
-      <a href="#" class="nav-logo">夏夏的留言板</a>
-      <div class="nav-right">
-        <span id="mbAdminStatus" class="admin-status"></span>
-        <button class="btn btn-small" id="mbAdminBtn">管理</button>
-      </div>
+  <!-- ===== Entry Overlay ===== -->
+  <div id="entryOverlay" class="entry-overlay">
+    <div class="entry-content">
+      <div class="entry-icon">✦</div>
+      <p class="entry-text">点击进入</p>
     </div>
-  </nav>
+  </div>
 
-  <!-- ===== Hero ===== -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>留言板</h1>
-      <p class="subtitle">在这里留下你想说的话，所有人都能看到。</p>
-    </div>
-  </section>
+  <!-- ===== Page Content (circle-reveal animated) ===== -->
+  <div id="pageContent" class="page-content">
 
-  <!-- ===== Message Form ===== -->
-  <main class="main-content">
-    <div id="mbLocalWarning" class="local-warning" style="display:none;">
-      当前为本地模式：留言仅保存在本浏览器中，其他设备无法看到。如需所有人可见，请配置 Supabase 后端（参见
-      <a href="https://github.com/xiaxiadayo/xiaxiadayo.github.io#readme">README</a>）。
-    </div>
-
-    <form id="mbForm" class="mb-form" autocomplete="off">
-      <div class="mb-form-row">
-        <label for="mbAuthor">署名</label>
-        <input type="text" id="mbAuthor" placeholder="你的名字" required />
+    <!-- ===== Hero / Welcome ===== -->
+    <section class="hero">
+      <div class="hero-particles" id="heroParticles"></div>
+      <div class="hero-inner fade-in">
+        <h1 class="hero-title">你好呀 ✿</h1>
+        <p class="hero-subtitle">这里是夏夏的角落</p>
+        <p class="hero-desc">一个安安静静的地方，存放一些碎片。</p>
       </div>
-      <div class="mb-form-row">
-        <label for="mbContent">留言内容</label>
-        <textarea id="mbContent" rows="5" placeholder="写下你想说的话…" required></textarea>
+    </section>
+
+    <!-- ===== Photo Grid ===== -->
+    <section class="section">
+      <h2 class="section-title fade-in">一些瞬间</h2>
+      <div class="photo-grid fade-in">
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia1/300/300" alt="瞬间" loading="lazy" /></div>
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia2/300/300" alt="瞬间" loading="lazy" /></div>
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia3/300/300" alt="瞬间" loading="lazy" /></div>
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia4/300/300" alt="瞬间" loading="lazy" /></div>
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia5/300/300" alt="瞬间" loading="lazy" /></div>
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia6/300/300" alt="瞬间" loading="lazy" /></div>
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia7/300/300" alt="瞬间" loading="lazy" /></div>
+        <div class="photo-item"><img src="https://picsum.photos/seed/xia8/300/300" alt="瞬间" loading="lazy" /></div>
       </div>
-      <button type="submit" class="btn btn-primary">发布留言</button>
-    </form>
+    </section>
 
-    <!-- ===== Message List ===== -->
-    <div id="mbList" class="mb-list"></div>
-    <div id="mbPagination" class="mb-pagination"></div>
-  </main>
+    <!-- ===== Musings 碎碎念 (4 columns) ===== -->
+    <section class="section">
+      <h2 class="section-title fade-in">碎碎念</h2>
+      <div class="musings-grid fade-in">
+        <div class="musing-card">
+          <div class="musing-emoji">☁️</div>
+          <p class="musing-text">今天的天空很蓝，适合什么都不想。</p>
+          <span class="musing-date">三月的某天</span>
+        </div>
+        <div class="musing-card">
+          <div class="musing-emoji">🌧️</div>
+          <p class="musing-text">下雨天窝在家里听歌，世界安静了好多。</p>
+          <span class="musing-date">雨天</span>
+        </div>
+        <div class="musing-card">
+          <div class="musing-emoji">🐱</div>
+          <p class="musing-text">路边的猫咪对我眨了眨眼，算是打过招呼了吧。</p>
+          <span class="musing-date">散步时</span>
+        </div>
+        <div class="musing-card">
+          <div class="musing-emoji">🌙</div>
+          <p class="musing-text">晚安，不管你是谁，希望你也能睡个好觉。</p>
+          <span class="musing-date">深夜</span>
+        </div>
+      </div>
+    </section>
 
-  <!-- ===== Toast ===== -->
-  <div id="mbToast" class="mb-toast"></div>
+    <!-- ===== Likes ===== -->
+    <section class="section likes-section">
+      <h2 class="section-title fade-in">喜欢的事</h2>
+      <div class="likes-grid fade-in">
+        <span class="like-tag">♪ 音乐</span>
+        <span class="like-tag">☁ 发呆</span>
+        <span class="like-tag">🐱 猫咪</span>
+        <span class="like-tag">📖 阅读</span>
+        <span class="like-tag">🌧 雨天</span>
+        <span class="like-tag">✿ 花花</span>
+        <span class="like-tag">🍵 奶茶</span>
+        <span class="like-tag">🌅 日落</span>
+      </div>
+    </section>
 
-  <!-- ===== Footer ===== -->
-  <footer class="footer">
-    <p>© 2024 – 2026 xiaxiadayo</p>
-  </footer>
+    <!-- ===== Footer ===== -->
+    <footer class="footer">
+      <p>© 2024 – 2026 夏夏</p>
+    </footer>
+  </div>
 
-  <!-- ===== Scripts ===== -->
-  <script src="/config.js"></script>
-  <script src="/assets/js/messageboard.js" defer></script>
-  <script>
-    // Navbar scroll shadow
-    window.addEventListener('scroll', function () {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-    });
-  </script>
+  <!-- ===== Music Player (fixed widget) ===== -->
+  <div id="musicPlayer" class="music-player hidden">
+    <button id="musicToggle" class="music-toggle" aria-label="播放/暂停">
+      <span class="music-icon" id="musicIcon">▶</span>
+    </button>
+    <div class="music-info">
+      <div class="music-title">Shelter</div>
+      <div class="music-artist">Porter Robinson &amp; Madeon</div>
+    </div>
+    <div class="music-eq" id="musicEq">
+      <span class="eq-bar"></span>
+      <span class="eq-bar"></span>
+      <span class="eq-bar"></span>
+      <span class="eq-bar"></span>
+    </div>
+  </div>
+
+  <!-- ===== Cat Pet (fixed bottom-right) ===== -->
+  <div id="catPet" class="cat-pet hidden" title="摸摸我~">
+    <div class="cat-bubble" id="catBubble"></div>
+    <pre class="cat-art" id="catArt">  ∧,,,∧
+( ̳• · • ̳)
+ /    づ♡</pre>
+  </div>
+
+  <!-- ===== Background Music ===== -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="/assets/music/shelter.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script src="/assets/js/main.js"></script>
 </body>
 </html>
