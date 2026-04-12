@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let resumeAfterPunish = false;
   let bgStartTime = 0;
   const BG_MUSIC_FADE_IN_MS = 2000;
-  const BG_MUSIC_PLAY_MS = 12000;
+  const BG_MUSIC_PLAY_MS = 12000; /* full-volume portion; total ≈ fade-in + play + fade-out */
   const BG_MUSIC_FADE_MS = 3000;
 
   const BARRAGE_BULLET_COUNT = 56;
