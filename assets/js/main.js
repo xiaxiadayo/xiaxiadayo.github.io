@@ -39,11 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
   let musicPlaying = false;
   const verifiedKey = 'xiaxia_contact_verified';
   let contactVerified = localStorage.getItem(verifiedKey) === '1';
+  let punishUsed = false;
 
   let audioCtx = null;
   let bgStep = 0;
   let bgTimer = null;
   let sharpTimer = null;
+  let bgStartTime = 0;
+  const BG_MUSIC_PLAY_MS = 20000;
+  const BG_MUSIC_FADE_MS = 3000;
 
   const BARRAGE_BULLET_COUNT = 56;
 
@@ -107,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function startBgMusic() {
     if (bgTimer) return;
     ensureAudioContext();
+    bgStartTime = Date.now();
 
     const lead = [
       659.25, 783.99, 987.77, 783.99,
@@ -122,11 +127,20 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     bgTimer = window.setInterval(() => {
+      const elapsed = Date.now() - bgStartTime;
+      if (elapsed >= BG_MUSIC_PLAY_MS + BG_MUSIC_FADE_MS) {
+        stopBgMusic();
+        return;
+      }
+      let vol = 1;
+      if (elapsed >= BG_MUSIC_PLAY_MS) {
+        vol = Math.max(0, 1 - (elapsed - BG_MUSIC_PLAY_MS) / BG_MUSIC_FADE_MS);
+      }
       const i = bgStep % lead.length;
-      playTone({ frequency: lead[i], duration: 0.12, volume: 0.03, type: 'square' });
-      playTone({ frequency: bass[i], duration: 0.18, volume: 0.02, type: 'triangle' });
+      playTone({ frequency: lead[i], duration: 0.12, volume: 0.03 * vol, type: 'square' });
+      playTone({ frequency: bass[i], duration: 0.18, volume: 0.02 * vol, type: 'triangle' });
       if (i % 4 === 0) {
-        playTone({ frequency: lead[i] * 2, duration: 0.05, volume: 0.012, type: 'square', when: 0.04 });
+        playTone({ frequency: lead[i] * 2, duration: 0.05, volume: 0.012 * vol, type: 'square', when: 0.04 });
       }
       bgStep += 1;
     }, 180);
@@ -152,8 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- 3. Cat Pet ---------- */
   const catNormal = ' /ᐠ｡ꞈ｡ᐟ\\\n(  づ♡ど )\n しーＪ';
-  const catHappy = ' /ᐠ˵• ⩊ •˵ᐟ\\\n(  づ♡ど )\n しーＪ';
-  const catBlush = ' /ᐠ˶//ω//˶ᐟ\\\n(  づ♡ど )\n しーＪ';
+  const catHappy = ' /ᐠ˵⩊˵ᐟ\\\n(  づ♡ど )\n しーＪ';
+  const catBlush = ' /ᐠ˶ω˶ᐟ\\\n(  づ♡ど )\n しーＪ';
   const catAngy = ' /ᐠ`ω´ᐟ\\\n(  づ♡ど )\n しーＪ';
   const catBarrageFaces = [
     '(=^･ω･^=)', '(=^･ｪ･^=)', '(=①ω①=)', '(=ＴェＴ=)', '(=｀ω´=)', '(=^‥^=)', '(=^-ω-^=)',
@@ -554,6 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showContactInfoOnly();
       return;
     }
+    if (punishUsed) return;
     hidePopup(contactModal);
     await startPunishSequence();
   });
@@ -561,9 +576,12 @@ document.addEventListener('DOMContentLoaded', () => {
   punishConfirm?.addEventListener('click', () => {
     stopSharpTone();
     punishOverlay.classList.add('hidden');
+    punishOverlay.classList.remove('active');
     punishConfirm.classList.add('hidden');
     punishMessage.classList.remove('flash', 'show', 'recovery');
     punishMessage.textContent = '';
+    punishOverlay.style.transition = '';
+    punishOverlay.style.background = '';
     document.body.classList.remove('no-scroll');
   });
 
@@ -574,6 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function startPunishSequence() {
+    punishUsed = true;
     stopBgMusic();
     document.body.classList.add('no-scroll');
     punishOverlay.classList.remove('hidden');
@@ -581,6 +600,8 @@ document.addEventListener('DOMContentLoaded', () => {
     punishConfirm.classList.add('hidden');
     punishMessage.textContent = '';
     punishMessage.classList.remove('show', 'flash', 'recovery');
+    punishOverlay.style.transition = '';
+    punishOverlay.style.background = '#000';
 
     startSharpTone();
 
@@ -597,12 +618,18 @@ document.addEventListener('DOMContentLoaded', () => {
     await wait(3000);
 
     punishMessage.classList.remove('show');
-    await wait(240);
+    await wait(500);
     punishMessage.textContent = '';
 
     stopSharpTone();
-    punishOverlay.classList.add('hidden');
-    document.body.classList.remove('no-scroll');
+
+    punishOverlay.style.transition = 'background 2s ease';
+    punishOverlay.style.background = '#fff';
+    await wait(2500);
+
+    punishMessage.textContent = '别乱输啦~';
+    punishMessage.classList.add('show', 'recovery');
+    punishConfirm.classList.remove('hidden');
   }
 
   function startSharpTone() {
