@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const SHARP_TONE_FREQUENCY = 1480;
   const SHARP_TONE_VOLUME = 0.035;
   const PUNISH_LOCK_DURATION_MS = 30000;
+  const BARRAGE_BULLET_COUNT = 18;
 
   /* ---------- 1. Entry Overlay ---------- */
   overlay.addEventListener('click', () => {
@@ -56,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       overlay.remove();
+      document.body.style.background = 'var(--bg)';
       document.body.classList.remove('no-scroll');
       musicPlayer.classList.remove('hidden');
       catPet.classList.remove('hidden');
@@ -143,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function launchCatBarrage() {
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < BARRAGE_BULLET_COUNT; i++) {
       const bullet = document.createElement('div');
       bullet.className = 'cat-bullet';
       bullet.textContent = catBarrageFaces[i % catBarrageFaces.length];
@@ -306,7 +308,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sharpOsc) return;
     if (!audioCtx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
+      if (!AudioCtx) {
+        console.warn('AudioContext is unavailable in this browser.');
+        return;
+      }
       audioCtx = new AudioCtx();
     }
     sharpOsc = audioCtx.createOscillator();
