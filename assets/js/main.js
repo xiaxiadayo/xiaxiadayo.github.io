@@ -1125,7 +1125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function triggerSunset() {
     currentTheme = 'dusk';
-    applyTheme('dusk', false);
+    applyTheme(currentTheme, false);
 
     if (!goldenLightActive) {
       goldenLightActive = true;
