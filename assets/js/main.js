@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let audioCtx = null;
   const SHARP_TONE_FREQUENCY = 1480;
   const SHARP_TONE_VOLUME = 0.035;
+  const PUNISH_LOCK_DURATION_MS = 30000;
 
   /* ---------- 1. Entry Overlay ---------- */
   overlay.addEventListener('click', () => {
@@ -282,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     punishMessage.classList.remove('flash');
     await wait(1000);
     punishMessage.textContent = '';
-    await wait(30000);
+    await wait(PUNISH_LOCK_DURATION_MS);
 
     punishOverlay.style.transition = 'background 2.2s ease';
     punishOverlay.style.background = '#d4f1f9';

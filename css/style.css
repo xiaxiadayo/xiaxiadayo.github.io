@@ -58,7 +58,7 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  clip-path: circle(150% at 50% 50%);
+  clip-path: circle(200% at 50% 50%);
 }
 
 .entry-overlay.revealing {
@@ -88,7 +88,7 @@ img { display: block; max-width: 100%; }
 }
 
 @keyframes overlayCircleOpen {
-  0% { clip-path: circle(150% at 50% 50%); }
+  0% { clip-path: circle(200% at 50% 50%); }
   100% { clip-path: circle(0% at 50% 50%); opacity: 0; }
 }
 
