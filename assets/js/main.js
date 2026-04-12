@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let sharpOsc = null;
   let sharpGain = null;
   let audioCtx = null;
+  const SHARP_TONE_FREQUENCY = 1480;
+  const SHARP_TONE_VOLUME = 0.035;
 
   /* ---------- 1. Entry Overlay ---------- */
   overlay.addEventListener('click', () => {
@@ -308,9 +310,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     sharpOsc = audioCtx.createOscillator();
     sharpGain = audioCtx.createGain();
-    sharpOsc.frequency.value = 1480;
+    sharpOsc.frequency.value = SHARP_TONE_FREQUENCY;
     sharpOsc.type = 'sawtooth';
-    sharpGain.gain.value = 0.035;
+    sharpGain.gain.value = SHARP_TONE_VOLUME;
     sharpOsc.connect(sharpGain);
     sharpGain.connect(audioCtx.destination);
     sharpOsc.start();
