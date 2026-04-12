@@ -36,18 +36,19 @@
       </div>
     </section>
 
-    <!-- ===== Photo Grid ===== -->
-    <section class="section">
-      <h2 class="section-title fade-in">一些瞬间</h2>
-      <div class="photo-grid fade-in">
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia1/300/300" alt="瞬间" loading="lazy" /></div>
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia2/300/300" alt="瞬间" loading="lazy" /></div>
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia3/300/300" alt="瞬间" loading="lazy" /></div>
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia4/300/300" alt="瞬间" loading="lazy" /></div>
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia5/300/300" alt="瞬间" loading="lazy" /></div>
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia6/300/300" alt="瞬间" loading="lazy" /></div>
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia7/300/300" alt="瞬间" loading="lazy" /></div>
-        <div class="photo-item"><img src="https://picsum.photos/seed/xia8/300/300" alt="瞬间" loading="lazy" /></div>
+    <!-- ===== Intro Split ===== -->
+    <section class="section intro-section">
+      <h2 class="section-title fade-in">关于夏夏</h2>
+      <div class="intro-split fade-in">
+        <div class="intro-image-wrap">
+          <img src="https://picsum.photos/seed/xia-intro/800/1200" alt="夏夏" loading="lazy" class="intro-image" />
+        </div>
+        <div class="intro-copy">
+          <h3>引言</h3>
+          <p>你好，我是夏夏。这里想放一些温柔、安静、也带点俏皮的小片段。</p>
+          <p>我喜欢把生活里轻轻闪过的念头收集起来，也想和你分享让我开心的事情。</p>
+          <p>如果你刚好路过，希望这里能给你一小会儿放松的时间。</p>
+        </div>
       </div>
     </section>
 
@@ -67,7 +68,7 @@
         </div>
         <div class="musing-card">
           <div class="musing-emoji">🐱</div>
-          <p class="musing-text">路边的猫咪对我眨了眨眼，算是打过招呼了吧。</p>
+          <p class="musing-text">路边的猫猫对我眨了眨眼，算是打过招呼了吧。</p>
           <span class="musing-date">散步时</span>
         </div>
         <div class="musing-card">
@@ -81,21 +82,27 @@
     <!-- ===== Likes ===== -->
     <section class="section likes-section">
       <h2 class="section-title fade-in">喜欢的事</h2>
-      <div class="likes-grid fade-in">
-        <span class="like-tag">♪ 音乐</span>
-        <span class="like-tag">☁ 发呆</span>
-        <span class="like-tag">🐱 猫咪</span>
-        <span class="like-tag">📖 阅读</span>
-        <span class="like-tag">🌧 雨天</span>
-        <span class="like-tag">✿ 花花</span>
-        <span class="like-tag">🍵 奶茶</span>
-        <span class="like-tag">🌅 日落</span>
+      <div class="likes-grid fade-in" id="likesGrid">
+        <button class="like-tag" data-like="music">♪ 音乐</button>
+        <button class="like-tag" data-like="daydream">☁ 发呆</button>
+        <button class="like-tag" data-like="cat">🐱 猫猫</button>
+        <button class="like-tag" data-like="rain">🌧 雨天</button>
+        <button class="like-tag" data-like="sunset">🌅 日落</button>
+        <button class="like-tag" data-like="game">🎮 玩游戏</button>
+        <button class="like-tag" data-like="travel">🧳 旅行</button>
+        <button class="like-tag" data-like="movie">🎬 电影</button>
+        <button class="like-tag" data-like="photography">📷 拍照</button>
+        <button class="like-tag" data-like="coding">💻 写代码</button>
+        <button class="like-tag" data-like="nightwalk">🌃 夜游</button>
+        <button class="like-tag" data-like="dessert">🍰 甜点</button>
+        <button class="like-tag" data-like="stargaze">✨ 看星星</button>
       </div>
     </section>
 
     <!-- ===== Footer ===== -->
     <footer class="footer">
       <p>© 2024 – 2026 夏夏</p>
+      <button id="contactTrigger" class="contact-trigger" type="button">联系我</button>
     </footer>
   </div>
 
@@ -119,15 +126,58 @@
   <!-- ===== Cat Pet (fixed bottom-right) ===== -->
   <div id="catPet" class="cat-pet hidden" title="摸摸我~">
     <div class="cat-bubble" id="catBubble"></div>
-    <pre class="cat-art" id="catArt">  ∧,,,∧
-( ̳• · • ̳)
- /    づ♡</pre>
+    <pre class="cat-art" id="catArt">    ／l、
+（°､ 。 ７
+　l、 ~ヽ
+　じしf_, )ノ</pre>
   </div>
+
+  <div id="catBarrage" class="cat-barrage"></div>
 
   <!-- ===== Background Music ===== -->
   <audio id="bgMusic" loop preload="auto">
-    <source src="/assets/music/shelter.mp3" type="audio/mpeg" />
+    <source src="/assets/music/theme.wav" type="audio/wav" />
   </audio>
+
+  <div id="likeModal" class="popup-overlay hidden" aria-hidden="true">
+    <div class="popup-card">
+      <button class="popup-close" id="likeModalClose" aria-label="关闭">×</button>
+      <h3 id="likeModalTitle"></h3>
+      <div id="likeModalBody"></div>
+      <div id="gameArea" class="game-area hidden">
+        <p>猜数字小游戏（1-9）</p>
+        <div class="game-input-row">
+          <input id="gameGuessInput" type="number" min="1" max="9" placeholder="输入 1-9" />
+          <button id="gameGuessButton" type="button">猜一下</button>
+        </div>
+        <p id="gameResult"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="contactModal" class="popup-overlay hidden" aria-hidden="true">
+    <div class="popup-card contact-card">
+      <button class="popup-close" id="contactModalClose" aria-label="关闭">×</button>
+      <h3 id="contactTitle">联系我</h3>
+      <div id="contactInputBlock">
+        <p>请输入：<strong>夏夏</strong></p>
+        <div class="contact-input-row">
+          <input id="contactInput" type="text" autocomplete="off" />
+          <button id="contactConfirmButton" type="button">确认</button>
+        </div>
+      </div>
+      <div id="contactInfo" class="hidden">
+        <p>GitHub：<a href="https://github.com/xiaxiadayo" target="_blank" rel="noopener noreferrer">https://github.com/xiaxiadayo</a></p>
+        <p>QQ：2436762144</p>
+        <p>电话：+44 7598851318</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="punishOverlay" class="punish-overlay hidden" aria-hidden="true">
+    <div class="punish-message" id="punishMessage"></div>
+    <button id="punishConfirm" class="punish-confirm hidden" type="button">确认</button>
+  </div>
 
   <script src="/assets/js/main.js"></script>
 </body>
