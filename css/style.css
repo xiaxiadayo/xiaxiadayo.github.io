@@ -66,6 +66,11 @@ img { display: block; max-width: 100%; }
   pointer-events: none;
 }
 
+.entry-overlay.revealing-desktop {
+  animation: overlayDesktopOpen 1.05s cubic-bezier(0.16, 0.84, 0.28, 1) forwards;
+  pointer-events: none;
+}
+
 .entry-content { text-align: center; }
 
 .entry-icon {
@@ -92,11 +97,25 @@ img { display: block; max-width: 100%; }
   100% { clip-path: circle(0% at 50% 50%); opacity: 0; }
 }
 
+@keyframes overlayDesktopOpen {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.06); }
+}
+
 /* ===== Page Content ===== */
 .page-content {
   background: var(--bg);
   min-height: 100vh;
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.985);
+}
+
+.page-content.revealed {
   visibility: visible;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.65s ease, transform 0.65s ease;
 }
 
 /* ===== Hero Section ===== */
@@ -421,7 +440,7 @@ img { display: block; max-width: 100%; }
 .cat-art {
   font-family: 'Courier New', monospace;
   font-size: 1rem;
-  line-height: 1.25;
+  line-height: 1.28;
   color: var(--text);
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(10px);
@@ -432,6 +451,8 @@ img { display: block; max-width: 100%; }
   box-shadow: var(--shadow);
   animation: catBreathe 3s ease-in-out infinite;
   white-space: pre;
+  text-align: center;
+  min-width: 130px;
   transition: background 0.3s;
 }
 
@@ -549,6 +570,66 @@ img { display: block; max-width: 100%; }
   margin-top: 1rem;
   border-top: 1px dashed var(--primary-light);
   padding-top: 0.8rem;
+}
+
+.music-pad-area {
+  margin-top: 1rem;
+  border-top: 1px dashed var(--primary-light);
+  padding-top: 0.8rem;
+}
+
+.music-pad-grid {
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.music-pad-cell {
+  border: 1.5px solid var(--primary);
+  background: #f8fdff;
+  color: var(--primary-dark);
+  border-radius: 10px;
+  min-height: 52px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+.music-pad-cell:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.music-pad-cell.active {
+  background: var(--primary-light);
+  transform: scale(0.97);
+}
+
+.tetris-board {
+  --cell-size: 20px;
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(10, var(--cell-size));
+  grid-template-rows: repeat(16, var(--cell-size));
+  justify-content: center;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--primary-light);
+  border-radius: 10px;
+  background: #fafdff;
+}
+
+.tetris-cell {
+  border: 1px solid #bed9ee;
+  border-radius: 4px;
+  background: transparent;
+}
+
+.tetris-cell.filled {
+  border: 2px solid var(--primary-dark);
+  background: transparent;
 }
 
 .game-input-row,
@@ -692,7 +773,12 @@ img { display: block; max-width: 100%; }
   .music-artist { font-size: 0.6rem; }
 
   .cat-pet { bottom: 12px; right: 12px; }
-  .cat-art { font-size: 0.85rem; padding: 8px 10px; }
+  .cat-art { font-size: 0.85rem; padding: 8px 10px; min-width: 114px; }
+
+  .tetris-board {
+    --cell-size: 16px;
+    gap: 1px;
+  }
 }
 
 @media (max-width: 400px) {

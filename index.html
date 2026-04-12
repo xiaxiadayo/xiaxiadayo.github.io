@@ -112,8 +112,8 @@
       <span class="music-icon" id="musicIcon">▶</span>
     </button>
     <div class="music-info">
-      <div class="music-title">Shelter</div>
-      <div class="music-artist">Porter Robinson &amp; Madeon</div>
+      <div class="music-title">8-bit</div>
+      <div class="music-artist">夏夏的小世界</div>
     </div>
     <div class="music-eq" id="musicEq">
       <span class="eq-bar"></span>
@@ -126,29 +126,30 @@
   <!-- ===== Cat Pet (fixed bottom-right) ===== -->
   <div id="catPet" class="cat-pet hidden" title="摸摸我~">
     <div class="cat-bubble" id="catBubble"></div>
-    <pre class="cat-art" id="catArt">    ／l、
-（°､ 。 ７
-　l、 ~ヽ
-　じしf_, )ノ</pre>
+    <pre class="cat-art" id="catArt"> /ᐠ｡ꞈ｡ᐟ\
+(  づ♡ど )
+ しーＪ</pre>
   </div>
 
   <div id="catBarrage" class="cat-barrage"></div>
-
-  <!-- ===== Background Music ===== -->
-  <audio id="bgMusic" loop preload="auto">
-    <source src="/assets/music/theme.wav" type="audio/wav" />
-  </audio>
 
   <div id="likeModal" class="popup-overlay hidden" aria-hidden="true">
     <div class="popup-card">
       <button class="popup-close" id="likeModalClose" aria-label="关闭">×</button>
       <h3 id="likeModalTitle"></h3>
       <div id="likeModalBody"></div>
+      <div id="musicPadArea" class="music-pad-area hidden">
+        <p>4 × 4 音乐格子（点击发声）</p>
+        <div id="musicPadGrid" class="music-pad-grid"></div>
+      </div>
       <div id="gameArea" class="game-area hidden">
-        <p>猜数字小游戏（1-9）</p>
+        <p>猫猫俄罗斯方块（中空方块）</p>
+        <div id="tetrisBoard" class="tetris-board" aria-label="俄罗斯方块游戏区域"></div>
         <div class="game-input-row">
-          <input id="gameGuessInput" type="number" min="1" max="9" placeholder="输入 1-9" />
-          <button id="gameGuessButton" type="button">猜一下</button>
+          <button id="tetrisLeftButton" type="button">←</button>
+          <button id="tetrisRotateButton" type="button">↻</button>
+          <button id="tetrisRightButton" type="button">→</button>
+          <button id="tetrisDropButton" type="button">↓</button>
         </div>
         <p id="gameResult"></p>
       </div>
