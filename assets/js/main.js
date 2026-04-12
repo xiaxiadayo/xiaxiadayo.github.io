@@ -164,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function finishEntry() {
-    pageContent.classList.remove('circle-revealing');
     pageContent.classList.add('revealed');
     observeFadeIns();
   }
