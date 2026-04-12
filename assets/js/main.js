@@ -382,6 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- 4. Likes interactions ---------- */
   const likeContentMap = {
     music: { title: '♪ 音乐', text: '点下面 4×4 格子，像打击垫一样每格一个不同音色。', pad: true },
+    daydream: { title: '☁ 发呆', text: '偶尔发呆是一种充电方式，什么都不做也很好。', special: true },
+    cat: { title: '🐱 猫猫', text: '猫猫是世界级治愈源，看到就会不自觉笑出来。', special: true },
+    rain: { title: '🌧 雨天', text: '雨声像天然白噪音，和心情一起慢慢沉下来。', special: true },
+    sunset: { title: '🌅 日落', text: '每次日落颜色都不一样，像今天专属的结尾。', special: true },
     game: { title: '🎮 玩游戏', text: '来玩猫猫主题俄罗斯方块吧（中间不填充颜色）。', game: true },
   };
 
@@ -1086,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(catThemeTimer);
     }
     savedThemeBeforeCat = currentTheme;
-    document.documentElement.setAttribute('data-theme', 'cat');
+    applyTheme('cat', false);
 
     catThemeTimer = setTimeout(() => {
       catThemeTimer = null;
@@ -1124,8 +1128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function triggerSunset() {
-    currentTheme = 'dusk';
-    applyTheme(currentTheme, false);
+    setTheme('dusk', false);
 
     if (!goldenLightActive) {
       goldenLightActive = true;
