@@ -842,9 +842,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startSharpTone() {
     if (sharpOsc) return;
-    punishOverlay.classList.add('strobing');
     const ctx = ensureAudioContext();
-    if (!ctx) return;
+    if (!ctx) {
+      punishOverlay.classList.remove('strobing');
+      return;
+    }
+    punishOverlay.classList.add('strobing');
 
     sharpOsc = ctx.createOscillator();
     sharpGain = ctx.createGain();
@@ -855,7 +858,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sharpOsc.frequency.setValueAtTime(1710, ctx.currentTime);
 
     sharpGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    sharpGain.gain.exponentialRampToValueAtTime(0.065, ctx.currentTime + 0.08);
+    sharpGain.gain.linearRampToValueAtTime(0.065, ctx.currentTime + 0.08);
 
     sharpLfo.type = 'square';
     sharpLfo.frequency.setValueAtTime(12, ctx.currentTime);
