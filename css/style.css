@@ -360,154 +360,192 @@ img {
   font-size: 0.95rem;
 }
 
-/* ===== Hobbies Section ===== */
-.hobbies-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-}
-
-.hobby-card {
+/* ===== Message Board (Giscus) ===== */
+.board-wrapper {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 2rem 1.5rem;
-  text-align: center;
+  padding: 2rem;
   box-shadow: var(--shadow);
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
 }
 
-.hobby-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-hover);
-  border-color: var(--primary-light);
+.board-toolbar {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  justify-content: center;
 }
 
-.hobby-card .hobby-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  display: block;
-  animation: bounce 3s ease-in-out infinite;
-}
-
-.hobby-card:nth-child(2) .hobby-icon { animation-delay: 0.3s; }
-.hobby-card:nth-child(3) .hobby-icon { animation-delay: 0.6s; }
-.hobby-card:nth-child(4) .hobby-icon { animation-delay: 0.9s; }
-.hobby-card:nth-child(5) .hobby-icon { animation-delay: 1.2s; }
-.hobby-card:nth-child(6) .hobby-icon { animation-delay: 1.5s; }
-
-.hobby-card h3 {
-  font-size: 1.15rem;
-  color: var(--primary-dark);
-  margin-bottom: 0.5rem;
-}
-
-.hobby-card p {
+.board-btn {
   font-size: 0.9rem;
-  color: var(--text-light);
-  line-height: 1.6;
+  padding: 0.6rem 1.4rem;
 }
 
-/* ===== Skills / Fun Facts ===== */
-.facts-section {
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--lavender) 50%, var(--mint) 100%);
-  border-radius: var(--radius);
-  padding: 3rem;
-  margin: 3rem auto;
-  max-width: 1100px;
-}
-
-.facts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.fact-item {
-  background: rgba(255, 255, 255, 0.85);
+.admin-panel {
+  background: linear-gradient(135deg, var(--primary-light), var(--lavender));
   border-radius: 16px;
   padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-hint {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  transition: transform 0.3s ease;
-  backdrop-filter: blur(8px);
-}
-
-.fact-item:hover {
-  transform: translateY(-4px);
-}
-
-.fact-item .fact-emoji {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.fact-item h4 {
-  color: var(--primary-dark);
-  margin-bottom: 0.3rem;
-  font-size: 1rem;
-}
-
-.fact-item p {
-  font-size: 0.9rem;
-  color: var(--text-light);
-  line-height: 1.6;
-}
-
-/* ===== Gallery ===== */
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-}
-
-.gallery-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: all 0.3s ease;
-}
-
-.gallery-card:hover {
-  transform: translateY(-6px) rotate(-1deg);
-  box-shadow: var(--shadow-hover);
-}
-
-.gallery-card .card-image {
-  height: 200px;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  position: relative;
+  gap: 0.8rem;
+  text-align: center;
+}
+
+.admin-hint p {
+  color: var(--primary-dark);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.comments-container {
+  transition: max-height 0.5s ease, opacity 0.3s ease;
   overflow: hidden;
 }
 
-.gallery-card:nth-child(1) .card-image { background: linear-gradient(135deg, var(--primary-light), var(--peach)); }
-.gallery-card:nth-child(2) .card-image { background: linear-gradient(135deg, var(--lavender), var(--sky)); }
-.gallery-card:nth-child(3) .card-image { background: linear-gradient(135deg, var(--mint), var(--yellow-light)); }
-.gallery-card:nth-child(4) .card-image { background: linear-gradient(135deg, var(--peach), var(--primary-light)); }
-.gallery-card:nth-child(5) .card-image { background: linear-gradient(135deg, var(--sky), var(--lavender)); }
-.gallery-card:nth-child(6) .card-image { background: linear-gradient(135deg, var(--yellow-light), var(--mint)); }
-
-.gallery-card .card-content {
-  padding: 1.2rem;
+.comments-container.collapsed {
+  max-height: 120px;
+  position: relative;
 }
 
-.gallery-card .card-content h3 {
-  font-size: 1.05rem;
-  color: var(--primary-dark);
-  margin-bottom: 0.3rem;
+.comments-container.collapsed::after {
+  content: '点击"展开留言"查看全部评论';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--white));
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.8rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-weight: 500;
 }
 
-.gallery-card .card-content p {
+.comments-inner {
+  min-height: 200px;
+}
+
+.board-note {
+  margin-top: 1.5rem;
   font-size: 0.85rem;
   color: var(--text-light);
 }
 
-/* ===== Message Board ===== */
+.board-note details {
+  background: var(--primary-light);
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+}
+
+.board-note summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.board-note ul {
+  margin-top: 0.8rem;
+  padding-left: 1.2rem;
+  line-height: 1.8;
+}
+
+.board-note a {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* ===== Toast ===== */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  background: rgba(137, 196, 225, 0.95);
+  color: white;
+  padding: 0.8rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(137, 196, 225, 0.4);
+  backdrop-filter: blur(8px);
+  transform: translateX(120%);
+  transition: transform 0.4s ease;
+  pointer-events: auto;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+/* ===== Admin Modal ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal-box {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-hover);
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+}
+
+.modal-box h3 {
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.modal-box input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--primary-light);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.3s;
+  margin-bottom: 1rem;
+}
+
+.modal-box input:focus {
+  border-color: var(--primary);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+/* ===== Contact Section ===== */
 .message-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -702,12 +740,6 @@ img {
     padding: 3rem 1.5rem;
   }
 
-  .facts-section {
-    padding: 2rem 1.5rem;
-    margin: 2rem 1rem;
-    border-radius: 16px;
-  }
-
   .message-section {
     padding: 2rem 1.5rem;
   }
@@ -732,271 +764,39 @@ img {
   }
 }
 
-/* ===== Game Section ===== */
-.game-section {
-  text-align: center;
-}
-
-.game-wrapper {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.game-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, var(--primary-light), var(--sky));
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.game-info {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  font-weight: 600;
-  color: var(--primary-dark);
-  font-size: 0.95rem;
-}
-
-.game-controls {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.game-controls .btn {
-  padding: 0.5rem 1.2rem;
-  font-size: 0.85rem;
-  border-radius: 12px;
-}
-
-#gameCanvas {
-  display: block;
-  width: 100%;
-  cursor: crosshair;
-  touch-action: none;
-}
-
-.game-hint {
-  padding: 0.8rem;
-  color: var(--text-light);
-  font-size: 0.8rem;
-  background: var(--primary-light);
-}
-
-/* ===== Image Gallery (Anime tribute) ===== */
-.tribute-section {
-  text-align: center;
-}
-
-.tribute-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.tribute-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: all 0.3s ease;
-}
-
-.tribute-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-hover);
-}
-
-.tribute-card img {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: contain;
-  background: linear-gradient(135deg, var(--primary-light), var(--lavender));
-  padding: 1rem;
-}
-
-.tribute-card .tribute-caption {
-  padding: 1rem;
-  font-size: 0.9rem;
-  color: var(--text-light);
-  font-weight: 500;
-}
-
-/* ===== Music Player – Vertical Bar Style ===== */
-.music-prompt {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  z-index: 9999;
-  display: none; /* shown by JS when needed */
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  background: rgba(137, 196, 225, 0.95);
-  color: white;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.85rem;
-  box-shadow: 0 4px 16px rgba(137, 196, 225, 0.4);
-  backdrop-filter: blur(8px);
-  transition: transform 0.2s;
-  font-family: inherit;
-}
-
-.music-prompt:hover {
-  transform: scale(1.05);
-}
-
-.music-player {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9998;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 10px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(100, 160, 200, 0.2);
-  border: 1.5px solid var(--primary-light);
-  width: 56px;
-  transition: all 0.3s ease;
-  opacity: 0.7;
-}
-
-.music-player:hover,
-.music-player.active {
-  opacity: 1;
-}
-
-.music-player .mp-title {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-size: 0.65rem;
-  color: var(--primary-dark);
-  font-weight: 600;
-  max-height: 80px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.music-player .mp-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 48px;
-  padding: 4px 0;
-}
-
-.music-player .mp-bar {
-  width: 4px;
-  background: linear-gradient(to top, var(--primary), var(--sky-deep));
-  border-radius: 2px;
-  height: 4px;
-  transition: height 0.1s ease;
-}
-
-.music-player .mp-btn {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 2px;
-  line-height: 1;
-  color: var(--primary-dark);
-  transition: transform 0.2s;
-  font-family: inherit;
-}
-
-.music-player .mp-btn:hover {
-  transform: scale(1.2);
-}
-
-.music-player .mp-volume {
-  writing-mode: vertical-lr;
-  direction: rtl;
-  width: 4px;
-  height: 50px;
-  accent-color: var(--primary);
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background: var(--primary-light);
-  border-radius: 2px;
-  outline: none;
-}
-
-.music-player .mp-volume::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background: var(--primary);
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.music-player .mp-volume::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background: var(--primary);
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-/* ===== Responsive: Game & Player ===== */
+/* ===== Responsive: Board ===== */
 @media (max-width: 768px) {
-  .game-header {
-    justify-content: center;
-    text-align: center;
+  .board-wrapper {
+    padding: 1.5rem 1rem;
   }
 
-  .game-info {
-    justify-content: center;
-    width: 100%;
+  .board-toolbar {
+    gap: 0.5rem;
   }
 
-  .game-controls {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .music-player {
-    bottom: 10px;
-    right: 10px;
-    width: 48px;
-    padding: 8px 6px;
-  }
-
-  .music-prompt {
-    bottom: 80px;
-    right: 10px;
+  .board-btn {
     font-size: 0.8rem;
+    padding: 0.5rem 1rem;
   }
 
-  .tribute-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+  .admin-panel {
+    padding: 1rem;
+  }
+
+  .toast {
+    font-size: 0.8rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .toast-container {
+    right: 10px;
+    left: 10px;
   }
 }
 
 @media (max-width: 480px) {
-  .tribute-grid {
-    grid-template-columns: 1fr;
+  .board-toolbar {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
