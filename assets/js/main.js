@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const verifiedKey = 'xiaxia_contact_verified';
   let contactVerified = localStorage.getItem(verifiedKey) === '1';
   let punishUsed = false;
+  let wrongInputCount = 0;
 
   let audioCtx = null;
   let bgStep = 0;
@@ -83,23 +84,60 @@ document.addEventListener('DOMContentLoaded', () => {
     osc.stop(now + duration + 0.02);
   }
 
+  /* ---------- helpers: animation detection ---------- */
+  function cssAnimationsBlocked() {
+    try {
+      const el = document.createElement('div');
+      el.style.animation = 'none 0s';
+      document.body.appendChild(el);
+      const cs = getComputedStyle(el);
+      const blocked = cs.animationName === '' && cs.animationDuration === '';
+      el.remove();
+      return blocked;
+    } catch { return false; }
+  }
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   /* ---------- 1. Entry Overlay ---------- */
   overlay.addEventListener('click', () => {
     const isDesktop = window.matchMedia('(min-width: 901px)').matches;
-    overlay.classList.add(isDesktop ? 'revealing-desktop' : 'revealing');
+    const animBlocked = reducedMotion || cssAnimationsBlocked();
+
+    if (animBlocked) {
+      overlay.classList.add('anim-fallback');
+    } else {
+      overlay.classList.add(isDesktop ? 'revealing-desktop' : 'revealing');
+    }
 
     startBgMusic();
 
+    const delay = animBlocked ? 50 : (isDesktop ? 1080 : 1280);
+
+    /* Safety fallback: ensure overlay is removed even if animation doesn't fire */
+    const safetyDelay = Math.max(delay + 500, 2000);
+    const safetyTimer = setTimeout(() => {
+      if (overlay.parentNode) {
+        overlay.remove();
+        finishEntry();
+      }
+    }, safetyDelay);
+
     setTimeout(() => {
+      clearTimeout(safetyTimer);
       overlay.remove();
-      pageContent.classList.add('revealed');
-      document.body.style.background = 'var(--bg)';
-      document.body.classList.remove('no-scroll');
-      musicPlayer.classList.remove('hidden');
-      catPet.classList.remove('hidden');
-      observeFadeIns();
-    }, isDesktop ? 1080 : 1280);
+      finishEntry();
+    }, delay);
   });
+
+  function finishEntry() {
+    pageContent.classList.add('revealed');
+    document.body.style.background = 'var(--bg)';
+    document.body.classList.remove('no-scroll');
+    musicPlayer.classList.remove('hidden');
+    catPet.classList.remove('hidden');
+    observeFadeIns();
+  }
 
   /* ---------- 2. Music Player Controls (8-bit) ---------- */
   function setMusicState(isPlaying) {
@@ -156,6 +194,51 @@ document.addEventListener('DOMContentLoaded', () => {
     setMusicState(false);
   }
 
+  /** Resume music, play for 5 seconds at full volume, then fade out and stop */
+  const RESUME_PLAY_MS = 5000;
+  const RESUME_FADE_MS = 3000;
+
+  function resumeMusicThenFadeOut() {
+    if (bgTimer) return;
+    ensureAudioContext();
+    bgStartTime = Date.now();
+
+    const lead = [
+      659.25, 783.99, 987.77, 783.99,
+      659.25, 587.33, 523.25, 587.33,
+      659.25, 783.99, 880.0, 783.99,
+      659.25, 587.33, 523.25, 493.88,
+    ];
+    const bass = [
+      164.81, 164.81, 196.0, 196.0,
+      130.81, 130.81, 146.83, 146.83,
+      174.61, 174.61, 196.0, 196.0,
+      130.81, 130.81, 123.47, 123.47,
+    ];
+
+    bgStep = 0;
+    bgTimer = window.setInterval(() => {
+      const elapsed = Date.now() - bgStartTime;
+      if (elapsed >= RESUME_PLAY_MS + RESUME_FADE_MS) {
+        stopBgMusic();
+        return;
+      }
+      let vol = 1;
+      if (elapsed >= RESUME_PLAY_MS) {
+        vol = Math.max(0, 1 - (elapsed - RESUME_PLAY_MS) / RESUME_FADE_MS);
+      }
+      const i = bgStep % lead.length;
+      playTone({ frequency: lead[i], duration: 0.12, volume: 0.03 * vol, type: 'square' });
+      playTone({ frequency: bass[i], duration: 0.18, volume: 0.02 * vol, type: 'triangle' });
+      if (i % 4 === 0) {
+        playTone({ frequency: lead[i] * 2, duration: 0.05, volume: 0.012 * vol, type: 'square', when: 0.04 });
+      }
+      bgStep += 1;
+    }, 180);
+
+    setMusicState(true);
+  }
+
   musicToggle.addEventListener('click', () => {
     if (musicPlaying) {
       stopBgMusic();
@@ -165,10 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ---------- 3. Cat Pet ---------- */
-  const catNormal = ' /ᐠ｡ꞈ｡ᐟ\\\n(  づ♡ど )\n しーＪ';
-  const catHappy = ' /ᐠ˵⩊˵ᐟ\\\n(  づ♡ど )\n しーＪ';
-  const catBlush = ' /ᐠ˶ω˶ᐟ\\\n(  づ♡ど )\n しーＪ';
-  const catAngy = ' /ᐠ`ω´ᐟ\\\n(  づ♡ど )\n しーＪ';
+  const catNormal = '／l、\n（°､ 。 ７\n  l、 ~ヽ\n  じしf_, )ノ';
+  const catHappy = '／l、\n（＾､ ＾ ７\n  l、 ~ヽ\n  じしf_, )ノ';
+  const catBlush = '／l、\n（˶､ ω ７\n  l、 ~ヽ\n  じしf_, )ノ';
+  const catAngy = '／l、\n（`､ ´ ７\n  l、 ~ヽ\n  じしf_, )ノ';
   const catBarrageFaces = [
     '(=^･ω･^=)', '(=^･ｪ･^=)', '(=①ω①=)', '(=ＴェＴ=)', '(=｀ω´=)', '(=^‥^=)', '(=^-ω-^=)',
     'ฅ(•ㅅ•❀)ฅ', 'ฅ(=✧ω✧=)ฅ', 'ฅ(๑•̀ω•́๑)ฅ', 'ฅ(^◕ᴥ◕^)ฅ', 'ฅ(^ω^ฅ)', 'ฅ(⌯͒• ɪ •⌯͒)ฅ',
@@ -218,16 +301,41 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function launchCatBarrage() {
-    for (let i = 0; i < BARRAGE_BULLET_COUNT; i++) {
+    const isDesktop = window.matchMedia('(min-width: 901px)').matches;
+    const count = isDesktop ? Math.min(BARRAGE_BULLET_COUNT, 80) : BARRAGE_BULLET_COUNT;
+    const animBlocked = reducedMotion || cssAnimationsBlocked();
+
+    for (let i = 0; i < count; i++) {
       const bullet = document.createElement('div');
       bullet.className = 'cat-bullet';
       bullet.textContent = catBarrageFaces[Math.floor(Math.random() * catBarrageFaces.length)];
-      bullet.style.top = `${Math.random() * 82 + 6}%`;
-      bullet.style.fontSize = `${Math.random() * 12 + 13}px`;
-      bullet.style.animationDelay = `${Math.random() * 1.1}s`;
-      bullet.style.animationDuration = `${Math.random() * 2.2 + 3.8}s`;
+      const topPos = Math.random() * 82 + 6;
+      bullet.style.top = `${topPos}%`;
+      const baseFontSize = isDesktop ? 16 : 13;
+      const fontRange = isDesktop ? 14 : 12;
+      bullet.style.fontSize = `${Math.random() * fontRange + baseFontSize}px`;
+
+      const delayMs = Math.random() * 1500;
+      const durationMs = (Math.random() * 2.5 + (isDesktop ? 5 : 3.8)) * 1000;
+      bullet.style.animationDelay = `${delayMs}ms`;
+      bullet.style.animationDuration = `${durationMs}ms`;
+
+      /* Fallback for when CSS animations are blocked by plugins */
+      if (animBlocked) {
+        bullet.classList.add('no-anim');
+        bullet.style.animation = 'none';
+        bullet.style.opacity = '0.9';
+        bullet.style.transform = 'translateX(0)';
+        requestAnimationFrame(() => {
+          bullet.style.transitionDelay = `${delayMs}ms`;
+          bullet.style.transitionDuration = `${durationMs}ms`;
+          bullet.style.transform = `translateX(calc(100vw + 250px))`;
+          bullet.style.opacity = '0';
+        });
+      }
+
       catBarrage.appendChild(bullet);
-      setTimeout(() => bullet.remove(), 7000);
+      setTimeout(() => bullet.remove(), durationMs + delayMs + 1000);
     }
   }
 
@@ -544,6 +652,21 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ---------- 6. Contact flow ---------- */
+  const wrongInputWarnings = [
+    '别乱输啦~ (╯°□°)╯',
+    '说了是夏夏嘛！(ﾉ｀Д´)ﾉ',
+    '你是不是故意的 (；¬_¬)',
+    '再乱来我要生气了哦 (ó﹏ò｡)',
+    '拜托啦好好输入嘛 (っ˘̩╭╮˘̩)っ',
+    '你到底想干嘛！！ (╬▔皿▔)╬',
+    '求你了好好输入好不好 (´;ω;`)',
+    '真的不是夏夏很难输入吗 ┐(´～`)┌',
+    '我真的会生气了哦 (ノಠ益ಠ)ノ',
+    '好啦好啦答案就是夏夏啦 ╮(╯▽╰)╭',
+    '你在考验我的耐心吗 (−_−) zzZ',
+    '最后提示一次！是！夏！夏！ ╰(‵□′)╯',
+  ];
+
   contactTrigger?.addEventListener('click', () => {
     if (contactVerified) {
       showContactInfoOnly();
@@ -552,6 +675,9 @@ document.addEventListener('DOMContentLoaded', () => {
     contactInput.value = '';
     contactInputBlock.classList.remove('hidden');
     contactInfo.classList.add('hidden');
+    if (punishUsed) {
+      document.querySelector('#contactInputBlock p').innerHTML = '<strong>输入错误请重新输入</strong>';
+    }
     showPopup(contactModal);
   });
 
@@ -568,17 +694,31 @@ document.addEventListener('DOMContentLoaded', () => {
       showContactInfoOnly();
       return;
     }
-    if (punishUsed) return;
-    hidePopup(contactModal);
-    await startPunishSequence();
+
+    wrongInputCount += 1;
+
+    if (!punishUsed) {
+      hidePopup(contactModal);
+      await startPunishSequence();
+      return;
+    }
+
+    /* After first punishment: show warning messages with kaomoji.
+       wrongInputCount starts at 1 for the first error (which triggers punishment).
+       Subtract 2: -1 because punishment was the 1st error, -1 for 0-based index. */
+    const warningIdx = Math.min(wrongInputCount - 2, wrongInputWarnings.length - 1);
+    const msg = wrongInputWarnings[Math.max(0, warningIdx)];
+    contactInput.value = '';
+    document.querySelector('#contactInputBlock p').innerHTML = `<strong>${msg}</strong>`;
+    contactInput.focus();
   });
 
   punishConfirm?.addEventListener('click', () => {
     stopSharpTone();
     punishOverlay.classList.add('hidden');
-    punishOverlay.classList.remove('active');
+    punishOverlay.classList.remove('active', 'locked');
     punishConfirm.classList.add('hidden');
-    punishMessage.classList.remove('flash', 'show', 'recovery');
+    punishMessage.classList.remove('flash', 'show', 'recovery', 'fade-in-msg', 'fade-out-msg');
     punishMessage.textContent = '';
     punishOverlay.style.transition = '';
     punishOverlay.style.background = '';
@@ -593,43 +733,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function startPunishSequence() {
     punishUsed = true;
+
+    /* Pause music */
     stopBgMusic();
+
     document.body.classList.add('no-scroll');
     punishOverlay.classList.remove('hidden');
-    punishOverlay.classList.add('active');
+    punishOverlay.classList.add('active', 'locked');
     punishConfirm.classList.add('hidden');
     punishMessage.textContent = '';
-    punishMessage.classList.remove('show', 'flash', 'recovery');
-    punishOverlay.style.transition = '';
+    punishMessage.classList.remove('show', 'flash', 'recovery', 'fade-in-msg', 'fade-out-msg');
+
+    /* Phase 1: Page goes black slowly (~2s) */
+    punishOverlay.style.transition = 'background 2s linear';
+    punishOverlay.style.background = 'rgba(0,0,0,0.15)';
+    await wait(50);
     punishOverlay.style.background = '#000';
-
     startSharpTone();
+    await wait(2200);
 
-    await wait(320);
+    /* Phase 2: Show red "你" then start fast flashing */
     punishMessage.textContent = '你';
-    punishMessage.classList.add('show', 'flash');
+    punishMessage.classList.add('show');
+    await wait(1000);
 
-    for (let i = 0; i < 15; i++) {
+    /* Start flashing and adding "！" */
+    punishMessage.classList.add('flash');
+
+    /* Calculate how many "！" can fit to edge of screen */
+    const testSpan = document.createElement('span');
+    testSpan.style.position = 'absolute';
+    testSpan.style.visibility = 'hidden';
+    testSpan.style.whiteSpace = 'nowrap';
+    testSpan.style.fontWeight = '700';
+    testSpan.style.fontSize = getComputedStyle(punishMessage).fontSize;
+    document.body.appendChild(testSpan);
+    const screenW = window.innerWidth * 0.96;
+    let maxBangs = 0;
+    let testStr = '你';
+    for (let i = 0; i < 200; i++) {
+      testStr += '！';
+      testSpan.textContent = testStr;
+      if (testSpan.offsetWidth >= screenW) {
+        maxBangs = i + 1;
+        break;
+      }
+    }
+    if (maxBangs === 0) maxBangs = 30;
+    testSpan.remove();
+
+    for (let i = 0; i < maxBangs; i++) {
       await wait(110);
       punishMessage.textContent += '！';
     }
 
+    /* Stop flashing, pause 1s */
     punishMessage.classList.remove('flash');
-    await wait(3000);
+    await wait(1000);
 
+    /* Text disappears */
     punishMessage.classList.remove('show');
     await wait(500);
     punishMessage.textContent = '';
 
     stopSharpTone();
 
-    punishOverlay.style.transition = 'background 2s ease';
-    punishOverlay.style.background = '#fff';
+    /* Phase 3: 30 second black screen - completely non-interactive (required by design) */
+    await wait(30000);
+
+    /* Phase 4: Slowly transition from black to theme color */
+    punishOverlay.style.transition = 'background 3s ease';
+    punishOverlay.style.background = 'var(--bg)';
+    await wait(3500);
+
+    /* Phase 5: Show "哎嘿开个玩笑" then fade out */
+    punishMessage.textContent = '哎嘿开个玩笑';
+    punishMessage.classList.add('recovery', 'fade-in-msg');
     await wait(2500);
 
-    punishMessage.textContent = '别乱输啦~';
-    punishMessage.classList.add('show', 'recovery');
+    punishMessage.classList.remove('fade-in-msg');
+    punishMessage.classList.add('fade-out-msg');
+    await wait(1300);
+
+    /* Phase 6: Fade in "是夏夏哦" with confirm button */
+    punishMessage.classList.remove('fade-out-msg');
+    punishMessage.textContent = '是夏夏哦';
+    punishMessage.classList.add('fade-in-msg');
+    await wait(1500);
+
     punishConfirm.classList.remove('hidden');
+    punishOverlay.classList.remove('locked');
+
+    /* Phase 7: Resume music, play 5s then fade out */
+    resumeMusicThenFadeOut();
   }
 
   function startSharpTone() {
