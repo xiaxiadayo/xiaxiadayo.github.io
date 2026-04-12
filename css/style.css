@@ -714,6 +714,15 @@ img { display: block; max-width: 100%; }
   animation: blacken 2s linear forwards;
 }
 
+.punish-overlay.strobing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+  animation: punishStrobe 0.08s steps(2, end) infinite;
+}
+
 .punish-overlay.locked {
   pointer-events: all !important;
   cursor: not-allowed;
@@ -784,6 +793,11 @@ img { display: block; max-width: 100%; }
   to { background: #000; }
 }
 
+@keyframes punishStrobe {
+  0%, 48% { opacity: 0; }
+  49%, 100% { opacity: 1; }
+}
+
 /* ===== Fade-in on scroll ===== */
 .fade-in {
   opacity: 0;
@@ -819,6 +833,9 @@ img { display: block; max-width: 100%; }
     transform: none !important;
   }
   .cat-bullet {
+    display: none !important;
+  }
+  .punish-overlay.strobing::after {
     display: none !important;
   }
 }
