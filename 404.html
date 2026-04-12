@@ -1,39 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><body
-    style='font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; height:100vh; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center'>
-    <div>
-        <style>
-            body {
-                color: #000;
-                background: #fff;
-                margin: 0;
-            }
-
-            .next-error-h1 {
-                border-right: 1px solid rgba(0, 0, 0, 0.3);
-            }
-
-            @media (prefers-color-scheme: dark) {
-                body {
-                    color: #fff;
-                    background: #000;
-                }
-
-                .next-error-h1 {
-                    border-right: 1px solid rgba(255, 255, 255, 0.3);
-                }
-            }
-        </style>
-        <h1 class="next-error-h1"
-            style='display: inline-block; margin: 0 20px 0 0; padding-right: 23px; font-size: 24px; font-weight: 500; vertical-align: top; line-height: 49px; font-feature-settings: "rlig" 1,"calt" 1,"ss01" 1,"ss06" 1 !important;'>
-            404</h1>
-        <div style="display: inline-block; text-align: left">
-            <h2 style="font-size: 14px; font-weight: 400; line-height: 49px; margin: 0">This page could not be found.
-            </h2>
-        </div>
-    </div>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>迷路了 🐱 | 夏夏的小窝</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Quicksand', 'Noto Sans SC', system-ui, sans-serif;
+      background: linear-gradient(135deg, #ffe4e9 0%, #e6e0f3 50%, #d4eeff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      color: #5a4a5a;
+    }
+    .container {
+      background: rgba(255,255,255,0.85);
+      border-radius: 24px;
+      padding: 3rem;
+      max-width: 500px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      backdrop-filter: blur(10px);
+    }
+    .emoji-big {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    h1 { font-size: 4rem; color: #e8879b; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.3rem; color: #8a7a8a; margin-bottom: 1.5rem; font-weight: 500; }
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #ffb6c1, #e8879b);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255,182,193,0.5);
+    }
+    .btn-home:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,182,193,0.6); }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="emoji-big">🐱</span>
+    <h1>404</h1>
+    <h2>哎呀～小猫咪迷路了，找不到这个页面呢</h2>
+    <a href="/" class="btn-home">🏠 回到首页</a>
+  </div>
 </body>
-
 </html>
