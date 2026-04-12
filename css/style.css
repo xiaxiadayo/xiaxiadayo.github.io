@@ -154,7 +154,7 @@ img { display: block; max-width: 100%; }
 
 .page-content.circle-revealing {
   visibility: visible;
-  animation: circleRevealOpen 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  animation: circleRevealOpen 2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
 }
 
 .page-content.revealed {
