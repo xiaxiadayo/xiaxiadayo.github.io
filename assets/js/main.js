@@ -45,7 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let audioCtx = null;
   let bgStep = 0;
   let bgTimer = null;
-  let sharpTimer = null;
+  let sharpOsc = null;
+  let sharpGain = null;
+  let sharpLfo = null;
+  let sharpLfoGain = null;
+  let resumeAfterPunish = false;
   let bgStartTime = 0;
   const BG_MUSIC_PLAY_MS = 20000;
   const BG_MUSIC_FADE_MS = 3000;
@@ -713,7 +717,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const warningIdx = Math.min(wrongInputCount - 2, wrongInputWarnings.length - 1);
     const msg = wrongInputWarnings[Math.max(0, warningIdx)];
     contactInput.value = '';
-    document.querySelector('#contactInputBlock p').innerHTML = `<strong>${msg}</strong>`;
+    document.querySelector('#contactInputBlock p').innerHTML = '<strong>输入错误请重新输入</strong>';
+    alert(msg);
     contactInput.focus();
   });
 
@@ -727,6 +732,10 @@ document.addEventListener('DOMContentLoaded', () => {
     punishOverlay.style.transition = '';
     punishOverlay.style.background = '';
     document.body.classList.remove('no-scroll');
+    if (resumeAfterPunish) {
+      resumeAfterPunish = false;
+      resumeMusicThenFadeOut();
+    }
   });
 
   function showContactInfoOnly() {
@@ -747,13 +756,13 @@ document.addEventListener('DOMContentLoaded', () => {
     punishConfirm.classList.add('hidden');
     punishMessage.textContent = '';
     punishMessage.classList.remove('show', 'flash', 'recovery', 'fade-in-msg', 'fade-out-msg');
+    startSharpTone();
 
     /* Phase 1: Page goes black slowly (~2s) */
     punishOverlay.style.transition = 'background 2s linear';
     punishOverlay.style.background = 'rgba(0,0,0,0.15)';
     await wait(50);
     punishOverlay.style.background = '#000';
-    startSharpTone();
     await wait(2200);
 
     /* Phase 2: Show red "你" then start fast flashing */
@@ -827,25 +836,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     punishConfirm.classList.remove('hidden');
     punishOverlay.classList.remove('locked');
-
-    /* Phase 7: Resume music, play 5s then fade out */
-    resumeMusicThenFadeOut();
+    resumeAfterPunish = true;
   }
 
   function startSharpTone() {
-    if (sharpTimer) return;
-    ensureAudioContext();
-    sharpTimer = window.setInterval(() => {
-      const base = 1320 + Math.random() * 420;
-      playTone({ frequency: base, duration: 0.05, volume: 0.07, type: 'sawtooth' });
-      playTone({ frequency: base * 0.5, duration: 0.03, volume: 0.04, type: 'square', when: 0.015 });
-    }, 85);
+    if (sharpOsc) return;
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    punishOverlay.classList.add('strobing');
+
+    sharpOsc = ctx.createOscillator();
+    sharpGain = ctx.createGain();
+    sharpLfo = ctx.createOscillator();
+    sharpLfoGain = ctx.createGain();
+
+    sharpOsc.type = 'sawtooth';
+    sharpOsc.frequency.setValueAtTime(1710, ctx.currentTime);
+
+    sharpGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    sharpGain.gain.linearRampToValueAtTime(0.065, ctx.currentTime + 0.08);
+
+    sharpLfo.type = 'square';
+    sharpLfo.frequency.setValueAtTime(12, ctx.currentTime);
+    sharpLfoGain.gain.setValueAtTime(0.022, ctx.currentTime);
+
+    sharpLfo.connect(sharpLfoGain);
+    sharpLfoGain.connect(sharpGain.gain);
+    sharpOsc.connect(sharpGain);
+    sharpGain.connect(ctx.destination);
+
+    sharpOsc.start();
+    sharpLfo.start();
   }
 
   function stopSharpTone() {
-    if (sharpTimer) {
-      clearInterval(sharpTimer);
-      sharpTimer = null;
+    punishOverlay.classList.remove('strobing');
+    if (sharpOsc) {
+      sharpOsc.stop();
+      sharpOsc.disconnect();
+      sharpOsc = null;
+    }
+    if (sharpLfo) {
+      sharpLfo.stop();
+      sharpLfo.disconnect();
+      sharpLfo = null;
+    }
+    if (sharpGain) {
+      sharpGain.disconnect();
+      sharpGain = null;
+    }
+    if (sharpLfoGain) {
+      sharpLfoGain.disconnect();
+      sharpLfoGain = null;
     }
   }
 
