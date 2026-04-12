@@ -71,6 +71,13 @@ img { display: block; max-width: 100%; }
   pointer-events: none;
 }
 
+/* Fallback: force hide overlay after animation even if blocked by plugins */
+.entry-overlay.anim-fallback {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 .entry-content { text-align: center; }
 
 .entry-icon {
@@ -451,7 +458,7 @@ img { display: block; max-width: 100%; }
   box-shadow: var(--shadow);
   animation: catBreathe 3s ease-in-out infinite;
   white-space: pre;
-  text-align: center;
+  text-align: left;
   min-width: 130px;
   transition: background 0.3s;
 }
@@ -509,18 +516,33 @@ img { display: block; max-width: 100%; }
 
 .cat-bullet {
   position: absolute;
-  left: -120px;
+  right: 100%;
   color: var(--primary-dark);
   font-family: 'Courier New', monospace;
   white-space: pre;
   opacity: 0.85;
+  will-change: transform, opacity;
   animation: catFly 6s linear forwards;
+}
+
+/* Fallback for plugins that block CSS animations */
+.cat-bullet.no-anim {
+  transition: transform 6s linear, opacity 6s linear;
 }
 
 @keyframes catFly {
   0% { transform: translateX(0); opacity: 0; }
-  10% { opacity: 0.9; }
-  100% { transform: translateX(calc(100vw + 220px)); opacity: 0; }
+  5% { opacity: 0.9; }
+  95% { opacity: 0.9; }
+  100% { transform: translateX(calc(100vw + 250px)); opacity: 0; }
+}
+
+/* Desktop barrage: larger text, more spread, better performance */
+@media (min-width: 901px) {
+  .cat-bullet {
+    font-size: 18px;
+    animation-duration: 7s;
+  }
 }
 
 .popup-overlay {
@@ -678,6 +700,7 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  transition: none;
 }
 
 .punish-overlay.active {
@@ -688,16 +711,29 @@ img { display: block; max-width: 100%; }
   animation: blacken 2s linear forwards;
 }
 
+.punish-overlay.locked {
+  pointer-events: all !important;
+  cursor: not-allowed;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .punish-message {
   color: var(--punish-red);
   font-size: clamp(3rem, 14vw, 8rem);
   font-weight: 700;
   opacity: 0;
   min-height: 1.2em;
+  max-width: 98vw;
+  overflow: hidden;
+  word-break: break-all;
+  text-align: center;
+  line-height: 1.1;
 }
 
 .punish-message.recovery {
   color: var(--punish-recovery-text);
+  font-size: clamp(1.5rem, 6vw, 3rem);
 }
 
 .punish-message.show {
@@ -706,6 +742,24 @@ img { display: block; max-width: 100%; }
 
 .punish-message.flash {
   animation: flashText 0.12s linear infinite alternate;
+}
+
+.punish-message.fade-in-msg {
+  animation: pMsgFadeIn 1.5s ease forwards;
+}
+
+.punish-message.fade-out-msg {
+  animation: pMsgFadeOut 1.2s ease forwards;
+}
+
+@keyframes pMsgFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pMsgFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .punish-confirm {
@@ -745,6 +799,24 @@ img { display: block; max-width: 100%; }
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  /* Still allow entry overlay to be removed */
+  .entry-overlay.revealing,
+  .entry-overlay.revealing-desktop {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .page-content.revealed {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .fade-in {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .cat-bullet {
+    display: none !important;
   }
 }
 
