@@ -281,16 +281,18 @@
     player.x = width / 2 - player.w / 2;
     player.y = height - player.h - 10;
     updateUI();
-    document.getElementById('btnStart').textContent = '🔄 重新开始';
+    var startBtn = document.getElementById('btnStart');
+    if (startBtn) startBtn.textContent = '🔄 重新开始';
   };
 
   window.gamePause = function () {
+    var pauseBtn = document.getElementById('btnPause');
     if (state === 'playing') {
       state = 'paused';
-      document.getElementById('btnPause').textContent = '▶️ 继续';
+      if (pauseBtn) pauseBtn.textContent = '▶️ 继续';
     } else if (state === 'paused') {
       state = 'playing';
-      document.getElementById('btnPause').textContent = '⏸ 暂停';
+      if (pauseBtn) pauseBtn.textContent = '⏸ 暂停';
     }
   };
 

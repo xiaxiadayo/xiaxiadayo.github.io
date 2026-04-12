@@ -191,7 +191,8 @@
     if (btnPlay) btnPlay.textContent = '⏸';
     if (promptEl) {
       promptEl.style.display = 'flex';
-      promptEl.querySelector('.prompt-text').textContent = '🔇 点击开启声音';
+      var promptText = promptEl.querySelector('.prompt-text');
+      if (promptText) promptText.textContent = '🔇 点击开启声音';
     }
     playerEl.classList.add('active');
 
