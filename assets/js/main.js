@@ -843,10 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function startSharpTone() {
     if (sharpOsc) return;
     const ctx = ensureAudioContext();
-    if (!ctx) {
-      punishOverlay.classList.remove('strobing');
-      return;
-    }
+    if (!ctx) return;
     punishOverlay.classList.add('strobing');
 
     sharpOsc = ctx.createOscillator();
