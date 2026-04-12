@@ -703,7 +703,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    /* After first punishment: show warning messages with kaomoji */
+    /* After first punishment: show warning messages with kaomoji.
+       wrongInputCount starts at 1 for the first error (which triggers punishment).
+       Subtract 2: -1 because punishment was the 1st error, -1 for 0-based index. */
     const warningIdx = Math.min(wrongInputCount - 2, wrongInputWarnings.length - 1);
     const msg = wrongInputWarnings[Math.max(0, warningIdx)];
     contactInput.value = '';
@@ -760,7 +762,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* Calculate how many "！" can fit to edge of screen */
     const testSpan = document.createElement('span');
-    testSpan.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-size:inherit;font-weight:700;';
+    testSpan.style.position = 'absolute';
+    testSpan.style.visibility = 'hidden';
+    testSpan.style.whiteSpace = 'nowrap';
+    testSpan.style.fontWeight = '700';
     testSpan.style.fontSize = getComputedStyle(punishMessage).fontSize;
     document.body.appendChild(testSpan);
     const screenW = window.innerWidth * 0.96;
@@ -793,7 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     stopSharpTone();
 
-    /* Phase 3: 30 second black screen - completely non-interactive */
+    /* Phase 3: 30 second black screen - completely non-interactive (required by design) */
     await wait(30000);
 
     /* Phase 4: Slowly transition from black to theme color */
