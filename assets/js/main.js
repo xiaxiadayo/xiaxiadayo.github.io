@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     musicPlayer.classList.remove('hidden');
     catPet.classList.remove('hidden');
 
-    const delay = animBlocked ? 50 : 1250;
+    const delay = animBlocked ? 50 : 1250; /* matches circleRevealOpen 1.2s + 50ms buffer */
 
     /* Safety fallback: ensure overlay is removed even if animation doesn't fire */
     const safetyDelay = Math.max(delay + 500, 2000);
