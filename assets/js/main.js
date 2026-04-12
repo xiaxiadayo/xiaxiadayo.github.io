@@ -112,7 +112,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startBgMusic();
 
-    const delay = animBlocked ? 50 : (isDesktop ? 1080 : 1280);
+    /* Start the circle-reveal on page content immediately */
+    pageContent.classList.add('circle-revealing');
+    document.body.style.background = 'var(--bg)';
+    document.body.classList.remove('no-scroll');
+    musicPlayer.classList.remove('hidden');
+    catPet.classList.remove('hidden');
+
+    const delay = animBlocked ? 50 : 1250;
 
     /* Safety fallback: ensure overlay is removed even if animation doesn't fire */
     const safetyDelay = Math.max(delay + 500, 2000);
@@ -131,11 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function finishEntry() {
+    pageContent.classList.remove('circle-revealing');
     pageContent.classList.add('revealed');
-    document.body.style.background = 'var(--bg)';
-    document.body.classList.remove('no-scroll');
-    musicPlayer.classList.remove('hidden');
-    catPet.classList.remove('hidden');
     observeFadeIns();
   }
 
@@ -248,10 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ---------- 3. Cat Pet ---------- */
-  const catNormal = '／l、\n（°､ 。 ７\n  l、 ~ヽ\n  じしf_, )ノ';
-  const catHappy = '／l、\n（＾､ ＾ ７\n  l、 ~ヽ\n  じしf_, )ノ';
-  const catBlush = '／l、\n（˶､ ω ７\n  l、 ~ヽ\n  じしf_, )ノ';
-  const catAngy = '／l、\n（`､ ´ ７\n  l、 ~ヽ\n  じしf_, )ノ';
+  const catNormal = '(=^･ω･^=)';
+  const catHappy = '(=^˃ᴗ˂^=)';
+  const catBlush = '(=^˶ᵕ˶^=)';
+  const catAngy = '(=^`ω´^=)';
   const catBarrageFaces = [
     '(=^･ω･^=)', '(=^･ｪ･^=)', '(=①ω①=)', '(=ＴェＴ=)', '(=｀ω´=)', '(=^‥^=)', '(=^-ω-^=)',
     'ฅ(•ㅅ•❀)ฅ', 'ฅ(=✧ω✧=)ฅ', 'ฅ(๑•̀ω•́๑)ฅ', 'ฅ(^◕ᴥ◕^)ฅ', 'ฅ(^ω^ฅ)', 'ฅ(⌯͒• ɪ •⌯͒)ฅ',
