@@ -873,12 +873,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function stopSharpTone() {
     punishOverlay.classList.remove('strobing');
     if (sharpOsc) {
-      try { sharpOsc.stop(); } catch (error) { void error; }
+      sharpOsc.stop();
       sharpOsc.disconnect();
       sharpOsc = null;
     }
     if (sharpLfo) {
-      try { sharpLfo.stop(); } catch (error) { void error; }
+      sharpLfo.stop();
       sharpLfo.disconnect();
       sharpLfo = null;
     }
