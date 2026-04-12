@@ -2,7 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('entryOverlay');
-  const pageContent = document.getElementById('pageContent');
   const bgMusic = document.getElementById('bgMusic');
   const musicPlayer = document.getElementById('musicPlayer');
   const musicToggle = document.getElementById('musicToggle');
@@ -11,88 +10,112 @@ document.addEventListener('DOMContentLoaded', () => {
   const catPet = document.getElementById('catPet');
   const catArt = document.getElementById('catArt');
   const catBubble = document.getElementById('catBubble');
+  const catBarrage = document.getElementById('catBarrage');
+  const likesGrid = document.getElementById('likesGrid');
+  const likeModal = document.getElementById('likeModal');
+  const likeModalClose = document.getElementById('likeModalClose');
+  const likeModalTitle = document.getElementById('likeModalTitle');
+  const likeModalBody = document.getElementById('likeModalBody');
+  const gameArea = document.getElementById('gameArea');
+  const gameGuessInput = document.getElementById('gameGuessInput');
+  const gameGuessButton = document.getElementById('gameGuessButton');
+  const gameResult = document.getElementById('gameResult');
+  const contactTrigger = document.getElementById('contactTrigger');
+  const contactModal = document.getElementById('contactModal');
+  const contactModalClose = document.getElementById('contactModalClose');
+  const contactInputBlock = document.getElementById('contactInputBlock');
+  const contactInfo = document.getElementById('contactInfo');
+  const contactInput = document.getElementById('contactInput');
+  const contactConfirmButton = document.getElementById('contactConfirmButton');
+  const punishOverlay = document.getElementById('punishOverlay');
+  const punishMessage = document.getElementById('punishMessage');
+  const punishConfirm = document.getElementById('punishConfirm');
 
   let musicPlaying = false;
+  const verifiedKey = 'xiaxia_contact_verified';
+  const prankDoneKey = 'xiaxia_contact_prank_done';
+  let contactVerified = localStorage.getItem(verifiedKey) === '1';
+  let prankDone = localStorage.getItem(prankDoneKey) === '1';
+  let sharpOsc = null;
+  let sharpGain = null;
+  let audioCtx = null;
+  const SHARP_TONE_FREQUENCY = 1480;
+  const SHARP_TONE_VOLUME = 0.035;
+  const PUNISH_LOCK_DURATION_MS = 30000;
+  const BARRAGE_BULLET_COUNT = 18;
 
-  /* ---------- 1. Entry Overlay → Circle Reveal ---------- */
+  /* ---------- 1. Entry Overlay ---------- */
   overlay.addEventListener('click', () => {
-    overlay.classList.add('fade-out');
+    overlay.classList.add('revealing');
 
-    /* Start circle reveal */
-    pageContent.classList.add('revealing');
-
-    /* Try to play music */
+    bgMusic.currentTime = 0;
     bgMusic.play().then(() => {
-      musicPlaying = true;
-      musicIcon.textContent = '⏸';
-      musicEq.classList.add('playing');
+      setMusicState(true);
     }).catch(() => {
-      /* Autoplay blocked — user can click play later */
-      musicPlaying = false;
+      setMusicState(false);
     });
 
-    /* After overlay fade */
     setTimeout(() => {
       overlay.remove();
-    }, 600);
-
-    /* After circle reveal completes */
-    setTimeout(() => {
-      pageContent.classList.remove('revealing');
-      pageContent.classList.add('revealed');
-      document.body.style.background = '#F0F8FF';
+      document.body.style.background = 'var(--bg)';
       document.body.classList.remove('no-scroll');
-
-      /* Show music player & cat */
       musicPlayer.classList.remove('hidden');
       catPet.classList.remove('hidden');
-
-      /* Trigger fade-in for elements already in viewport */
       observeFadeIns();
-    }, 1500);
+    }, 1280);
   });
 
   /* ---------- 2. Music Player Controls ---------- */
+  function setMusicState(isPlaying) {
+    musicPlaying = isPlaying;
+    musicIcon.textContent = isPlaying ? '⏸' : '▶';
+    musicEq.classList.toggle('playing', isPlaying);
+  }
+
   musicToggle.addEventListener('click', () => {
-    if (musicPlaying) {
+    if (!bgMusic.paused && musicPlaying) {
       bgMusic.pause();
-      musicPlaying = false;
-      musicIcon.textContent = '▶';
-      musicEq.classList.remove('playing');
+      setMusicState(false);
     } else {
       bgMusic.play().then(() => {
-        musicPlaying = true;
-        musicIcon.textContent = '⏸';
-        musicEq.classList.add('playing');
+        setMusicState(true);
       }).catch(() => {});
     }
   });
 
-  /* Sync state when music ends */
   bgMusic.addEventListener('ended', () => {
-    musicPlaying = false;
-    musicIcon.textContent = '▶';
-    musicEq.classList.remove('playing');
+    setMusicState(false);
+  });
+
+  bgMusic.addEventListener('pause', () => {
+    if (!bgMusic.ended) setMusicState(false);
+  });
+
+  bgMusic.addEventListener('play', () => {
+    setMusicState(true);
   });
 
   /* ---------- 3. Cat Pet ---------- */
-  /* Cat expressions: Normal = (• · •), Happy = (≧ω≦), Sleepy = (– ω –) */
-  const catNormal = '  ∧,,,∧\n( ̳• · • ̳)\n /    づ♡';
-  const catHappy = '  ∧,,,∧\n( ̳≧ω≦ ̳)\n /    づ✨';
-  const catSleepy = '  ∧,,,∧\n( ̳– ω – ̳)\n /    づ💤';
+  const catNormal = '    ／l、\n（°､ 。 ７\n　l、 ~ヽ\n　じしf_, )ノ';
+  const catHappy = '    ／l、\n（^､ ^ ７\n　l、 ~ヽ\n　じしf_, )ノ';
+  const catBlush = '    ／l、\n（*､ * ７\n　l、 ~ヽ\n　じしf_, )ノ';
+  const catAngy = '    ／l、\n（>､ < ７\n　l、 ~ヽ\n　じしf_, )ノ';
+  const catBarrageFaces = ['(=^･ω･^=)', 'ฅ(•ㅅ•❀)ฅ', '／l、（°､ 。 ７'];
 
   const catMessages = [
     '喵~',
     '别戳我啦~',
     '今天也要开心哦',
-    '想吃小鱼干...',
-    '摸摸~',
-    '(=^-ω-^=)',
-    '你好呀~',
-    '嗯...困了',
+    '摸摸好舒服~',
+    '猫猫来啦',
+    '你今天也很可爱',
+    '再摸一下嘛',
   ];
 
   let bubbleTimer = null;
+  let catMoodIndex = 0;
+  const catMoodCycle = [catHappy, catBlush, catAngy, catHappy];
+  let gameTarget = Math.floor(Math.random() * 9) + 1;
 
   catPet.addEventListener('mouseenter', () => {
     catArt.textContent = catHappy;
@@ -103,25 +126,231 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   catPet.addEventListener('click', () => {
-    /* Show random message */
     const msg = catMessages[Math.floor(Math.random() * catMessages.length)];
     catBubble.textContent = msg;
     catBubble.classList.add('show');
 
-    /* Briefly show sleepy face */
-    catArt.textContent = catSleepy;
+    catArt.textContent = catMoodCycle[catMoodIndex % catMoodCycle.length];
+    catMoodIndex += 1;
     setTimeout(() => {
       catArt.textContent = catHappy;
-    }, 800);
+    }, 550);
 
-    /* Hide bubble after delay */
     clearTimeout(bubbleTimer);
     bubbleTimer = setTimeout(() => {
       catBubble.classList.remove('show');
-    }, 2500);
+    }, 2200);
+
+    launchCatBarrage();
   });
 
-  /* ---------- 4. Scroll Fade-in Animation ---------- */
+  function launchCatBarrage() {
+    for (let i = 0; i < BARRAGE_BULLET_COUNT; i++) {
+      const bullet = document.createElement('div');
+      bullet.className = 'cat-bullet';
+      bullet.textContent = catBarrageFaces[i % catBarrageFaces.length];
+      bullet.style.top = `${Math.random() * 80 + 8}%`;
+      bullet.style.fontSize = `${Math.random() * 14 + 14}px`;
+      bullet.style.animationDelay = `${Math.random() * 1.3}s`;
+      bullet.style.animationDuration = `${Math.random() * 2.5 + 3.8}s`;
+      catBarrage.appendChild(bullet);
+      setTimeout(() => bullet.remove(), 7000);
+    }
+  }
+
+  /* ---------- 4. Likes interactions ---------- */
+  const likeContentMap = {
+    music: { title: '♪ 音乐', text: '我喜欢在傍晚放慢节奏听歌，像在云里慢慢散步。' },
+    daydream: { title: '☁ 发呆', text: '偶尔发呆是一种充电方式，什么都不做也很好。' },
+    cat: { title: '🐱 猫猫', text: '猫猫是世界级治愈源，看到就会不自觉笑出来。' },
+    rain: { title: '🌧 雨天', text: '雨声像天然白噪音，和心情一起慢慢沉下来。' },
+    sunset: { title: '🌅 日落', text: '每次日落颜色都不一样，像今天专属的结尾。' },
+    game: { title: '🎮 玩游戏', text: '来玩一个小小的猜数字游戏吧！', game: true },
+    travel: { title: '🧳 旅行', text: '喜欢走走停停，收集陌生城市里温柔的小细节。' },
+    movie: { title: '🎬 电影', text: '好电影像一段借来的生命，两个小时很值得。' },
+    photography: { title: '📷 拍照', text: '拍照是为了留住当时那一秒“啊真好”的感觉。' },
+    coding: { title: '💻 写代码', text: '把想法变成可运行的页面，超有成就感。' },
+    nightwalk: { title: '🌃 夜游', text: '夜风很轻的时候，街道会变得像一条慢镜头。' },
+    dessert: { title: '🍰 甜点', text: '甜甜的食物会把坏情绪先按下暂停键。' },
+    stargaze: { title: '✨ 看星星', text: '抬头看星星，会觉得很多事都没那么可怕。' },
+  };
+
+  likesGrid?.addEventListener('click', (event) => {
+    const target = event.target.closest('.like-tag');
+    if (!target) return;
+    const key = target.dataset.like;
+    const data = key && likeContentMap[key];
+    if (!data) return;
+    likeModalTitle.textContent = data.title;
+    likeModalBody.textContent = data.text;
+    gameArea.classList.toggle('hidden', !data.game);
+    if (data.game) {
+      gameTarget = Math.floor(Math.random() * 9) + 1;
+      gameResult.textContent = '';
+      gameGuessInput.value = '';
+    } else {
+      gameResult.textContent = '';
+    }
+    showPopup(likeModal);
+  });
+
+  gameGuessButton?.addEventListener('click', () => {
+    const value = Number(gameGuessInput.value);
+    if (!Number.isInteger(value) || value < 1 || value > 9) {
+      gameResult.textContent = '请输入 1-9 的数字。';
+      return;
+    }
+    if (value === gameTarget) {
+      gameResult.textContent = `猜中啦！答案就是 ${gameTarget}。已为你刷新下一局~`;
+      gameTarget = Math.floor(Math.random() * 9) + 1;
+    } else {
+      gameResult.textContent = value > gameTarget ? '有点大啦，再试试更小的数字。' : '有点小啦，再试试更大的数字。';
+    }
+    gameGuessInput.value = '';
+  });
+
+  likeModalClose?.addEventListener('click', () => hidePopup(likeModal));
+  likeModal?.addEventListener('click', (event) => {
+    if (event.target === likeModal) hidePopup(likeModal);
+  });
+
+  /* ---------- 5. Contact flow ---------- */
+  contactTrigger?.addEventListener('click', () => {
+    if (contactVerified || prankDone) {
+      showContactInfoOnly();
+      return;
+    }
+    contactInput.value = '';
+    contactInputBlock.classList.remove('hidden');
+    contactInfo.classList.add('hidden');
+    showPopup(contactModal);
+  });
+
+  contactModalClose?.addEventListener('click', () => hidePopup(contactModal));
+  contactModal?.addEventListener('click', (event) => {
+    if (event.target === contactModal) hidePopup(contactModal);
+  });
+
+  contactConfirmButton?.addEventListener('click', async () => {
+    const value = contactInput.value.trim();
+    if (value === '夏夏') {
+      contactVerified = true;
+      localStorage.setItem(verifiedKey, '1');
+      showContactInfoOnly();
+      return;
+    }
+    hidePopup(contactModal);
+    await startPunishSequence();
+  });
+
+  punishConfirm?.addEventListener('click', () => {
+    stopSharpTone();
+    punishOverlay.classList.add('hidden');
+    punishConfirm.classList.add('hidden');
+    punishMessage.classList.remove('flash', 'show', 'recovery');
+    punishMessage.textContent = '';
+    punishOverlay.style.transition = '';
+    punishOverlay.style.background = '';
+    document.body.classList.remove('no-scroll');
+    prankDone = true;
+    localStorage.setItem(prankDoneKey, '1');
+  });
+
+  function showContactInfoOnly() {
+    contactInputBlock.classList.add('hidden');
+    contactInfo.classList.remove('hidden');
+    showPopup(contactModal);
+  }
+
+  async function startPunishSequence() {
+    document.body.classList.add('no-scroll');
+    punishOverlay.classList.remove('hidden');
+    punishOverlay.classList.add('active', 'blackening');
+    punishConfirm.classList.add('hidden');
+    punishMessage.textContent = '';
+    punishMessage.classList.remove('show', 'flash', 'recovery');
+    startSharpTone();
+
+    await wait(2000);
+    punishOverlay.classList.remove('blackening');
+    punishMessage.textContent = '你';
+    punishMessage.classList.add('show');
+
+    await wait(1000);
+    punishMessage.classList.add('flash');
+    for (let i = 0; i < 15; i++) {
+      await wait(110);
+      punishMessage.textContent += '！';
+    }
+    punishMessage.classList.remove('flash');
+    await wait(1000);
+    punishMessage.textContent = '';
+    await wait(PUNISH_LOCK_DURATION_MS);
+
+    punishOverlay.style.transition = 'background 2.2s ease';
+    punishOverlay.style.background = '#d4f1f9';
+    await wait(2400);
+
+    punishMessage.classList.add('recovery');
+    punishMessage.textContent = '哎嘿 开个玩笑';
+    punishMessage.classList.add('show');
+    await wait(1400);
+    punishMessage.classList.remove('show');
+    await wait(600);
+    punishMessage.textContent = '夏夏哦。';
+    punishMessage.classList.add('show');
+    await wait(1200);
+
+    punishConfirm.classList.remove('hidden');
+  }
+
+  function startSharpTone() {
+    if (sharpOsc) return;
+    if (!audioCtx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        console.warn('AudioContext is unavailable in this browser.');
+        return;
+      }
+      audioCtx = new AudioCtx();
+    }
+    sharpOsc = audioCtx.createOscillator();
+    sharpGain = audioCtx.createGain();
+    sharpOsc.frequency.value = SHARP_TONE_FREQUENCY;
+    sharpOsc.type = 'sawtooth';
+    sharpGain.gain.value = SHARP_TONE_VOLUME;
+    sharpOsc.connect(sharpGain);
+    sharpGain.connect(audioCtx.destination);
+    sharpOsc.start();
+  }
+
+  function stopSharpTone() {
+    if (sharpOsc) {
+      sharpOsc.stop();
+      sharpOsc.disconnect();
+      sharpOsc = null;
+    }
+    if (sharpGain) {
+      sharpGain.disconnect();
+      sharpGain = null;
+    }
+  }
+
+  function showPopup(node) {
+    node.classList.remove('hidden');
+    node.setAttribute('aria-hidden', 'false');
+  }
+
+  function hidePopup(node) {
+    node.classList.add('hidden');
+    node.setAttribute('aria-hidden', 'true');
+  }
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /* ---------- 6. Scroll Fade-in Animation ---------- */
   function observeFadeIns() {
     const fadeEls = document.querySelectorAll('.fade-in');
     if (!('IntersectionObserver' in window)) {
@@ -144,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fadeEls.forEach(el => observer.observe(el));
   }
 
-  /* ---------- 5. Hero Floating Particles ---------- */
+  /* ---------- 7. Hero Floating Particles ---------- */
   function createParticles() {
     const container = document.getElementById('heroParticles');
     if (!container) return;
