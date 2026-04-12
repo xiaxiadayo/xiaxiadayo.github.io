@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const catHappy = '    ／l、\n（^､ ^ ７\n　l、 ~ヽ\n　じしf_, )ノ';
   const catBlush = '    ／l、\n（*､ * ７\n　l、 ~ヽ\n　じしf_, )ノ';
   const catAngy = '    ／l、\n（>､ < ７\n　l、 ~ヽ\n　じしf_, )ノ';
+  const catBarrageFaces = ['(=^･ω･^=)', 'ฅ(•ㅅ•❀)ฅ', '／l、（°､ 。 ７'];
 
   const catMessages = [
     '喵~',
@@ -109,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let bubbleTimer = null;
   let catMoodIndex = 0;
   const catMoodCycle = [catHappy, catBlush, catAngy, catHappy];
+  let gameTarget = Math.floor(Math.random() * 9) + 1;
 
   catPet.addEventListener('mouseenter', () => {
     catArt.textContent = catHappy;
@@ -141,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < 18; i++) {
       const bullet = document.createElement('div');
       bullet.className = 'cat-bullet';
-      bullet.textContent = i % 3 === 0 ? '(=^･ω･^=)' : i % 3 === 1 ? 'ฅ(•ㅅ•❀)ฅ' : '／l、（°､ 。 ７';
+      bullet.textContent = catBarrageFaces[i % catBarrageFaces.length];
       bullet.style.top = `${Math.random() * 80 + 8}%`;
       bullet.style.fontSize = `${Math.random() * 14 + 14}px`;
       bullet.style.animationDelay = `${Math.random() * 1.3}s`;
@@ -177,7 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
     likeModalTitle.textContent = data.title;
     likeModalBody.textContent = data.text;
     gameArea.classList.toggle('hidden', !data.game);
-    if (!data.game) gameResult.textContent = '';
+    if (data.game) {
+      gameTarget = Math.floor(Math.random() * 9) + 1;
+      gameResult.textContent = '';
+      gameGuessInput.value = '';
+    } else {
+      gameResult.textContent = '';
+    }
     showPopup(likeModal);
   });
 
@@ -187,8 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
       gameResult.textContent = '请输入 1-9 的数字。';
       return;
     }
-    const answer = Math.floor(Math.random() * 9) + 1;
-    gameResult.textContent = value === answer ? `猜中啦！答案就是 ${answer}。` : `这次是 ${answer}，再来一局！`;
+    if (value === gameTarget) {
+      gameResult.textContent = `猜中啦！答案就是 ${gameTarget}。已为你刷新下一局~`;
+      gameTarget = Math.floor(Math.random() * 9) + 1;
+    } else {
+      gameResult.textContent = value > gameTarget ? '有点大啦，再试试更小的数字。' : '有点小啦，再试试更大的数字。';
+    }
     gameGuessInput.value = '';
   });
 
@@ -230,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stopSharpTone();
     punishOverlay.classList.add('hidden');
     punishConfirm.classList.add('hidden');
-    punishMessage.classList.remove('flash', 'show');
+    punishMessage.classList.remove('flash', 'show', 'recovery');
     punishMessage.textContent = '';
     punishOverlay.style.transition = '';
     punishOverlay.style.background = '';
@@ -251,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     punishOverlay.classList.add('active', 'blackening');
     punishConfirm.classList.add('hidden');
     punishMessage.textContent = '';
-    punishMessage.classList.remove('show', 'flash');
+    punishMessage.classList.remove('show', 'flash', 'recovery');
     startSharpTone();
 
     await wait(2000);
@@ -274,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     punishOverlay.style.background = '#d4f1f9';
     await wait(2400);
 
-    punishMessage.style.color = '#2f5370';
+    punishMessage.classList.add('recovery');
     punishMessage.textContent = '哎嘿 开个玩笑';
     punishMessage.classList.add('show');
     await wait(1400);

@@ -17,6 +17,8 @@
   --white: #FFFFFF;
   --accent: #FFB6C1;
   --lavender: #dde8f8;
+  --punish-red: #ff1010;
+  --punish-recovery-text: #2f5370;
   --shadow: 0 4px 20px rgba(100, 170, 220, 0.12);
   --shadow-hover: 0 8px 32px rgba(100, 170, 220, 0.22);
   --radius: 14px;
@@ -606,11 +608,15 @@ img { display: block; max-width: 100%; }
 }
 
 .punish-message {
-  color: #ff1010;
+  color: var(--punish-red);
   font-size: clamp(3rem, 14vw, 8rem);
   font-weight: 700;
   opacity: 0;
   min-height: 1.2em;
+}
+
+.punish-message.recovery {
+  color: var(--punish-recovery-text);
 }
 
 .punish-message.show {
