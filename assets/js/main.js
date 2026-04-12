@@ -105,44 +105,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- 1. Entry Overlay ---------- */
   overlay.addEventListener('click', () => {
-    const isDesktop = window.matchMedia('(min-width: 901px)').matches;
     const animBlocked = reducedMotion || cssAnimationsBlocked();
-
-    if (animBlocked) {
-      overlay.classList.add('anim-fallback');
-    } else {
-      overlay.classList.add(isDesktop ? 'revealing-desktop' : 'revealing');
-    }
 
     startBgMusic();
 
-    /* Start the circle-reveal on page content immediately */
-    pageContent.classList.add('circle-revealing');
-    document.body.style.background = 'var(--bg)';
     document.body.classList.remove('no-scroll');
     musicPlayer.classList.remove('hidden');
     catPet.classList.remove('hidden');
 
-    const delay = animBlocked ? 50 : 1250; /* matches circleRevealOpen 1.2s + 50ms buffer */
+    if (animBlocked) {
+      overlay.classList.add('anim-fallback');
+      pageContent.classList.add('revealed');
+      document.body.style.background = 'var(--bg)';
+      setTimeout(() => {
+        if (overlay.parentNode) overlay.remove();
+        finishEntry();
+      }, 60);
+      return;
+    }
 
-    /* Safety fallback: ensure overlay is removed even if animation doesn't fire */
-    const safetyDelay = Math.max(delay + 500, 2000);
+    runEntryRings();
+  });
+
+  function runEntryRings() {
+    overlay.classList.add('rings');
+
+    const layer = document.createElement('div');
+    layer.className = 'entry-rings-layer';
+    overlay.appendChild(layer);
+
+    const rings = 5;
+    const gap = 140;
+    const ringDur = 760;
+    const total = gap * (rings - 1) + ringDur;
+
+    for (let i = 0; i < rings; i++) {
+      const r = document.createElement('div');
+      r.className = 'entry-ring';
+      r.style.animationDelay = i * gap + 'ms';
+      r.style.borderColor = 'rgba(240, 248, 255, ' + Math.max(0.25, 0.9 - i * 0.13) + ')';
+      layer.appendChild(r);
+    }
+
     const safetyTimer = setTimeout(() => {
       if (overlay.parentNode) {
         overlay.remove();
         finishEntry();
       }
-    }, safetyDelay);
+    }, total + 600);
 
     setTimeout(() => {
       clearTimeout(safetyTimer);
-      overlay.remove();
+      document.body.style.background = 'var(--bg)';
+      pageContent.classList.add('revealed');
+      if (overlay.parentNode) overlay.remove();
       finishEntry();
-    }, delay);
-  });
+    }, total + 60);
+  }
 
   function finishEntry() {
-    pageContent.classList.remove('circle-revealing');
     pageContent.classList.add('revealed');
     observeFadeIns();
   }
