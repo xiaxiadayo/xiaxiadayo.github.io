@@ -10,6 +10,7 @@
   var BACKEND = CFG.STORAGE_BACKEND || "local";
   var ADMIN_PWD = CFG.ADMIN_PASSWORD || "xiaxia";
   var LS_KEY = "mb_messages";
+  var COLLAPSE_HEIGHT = 120;
 
   /* ---------- State ---------- */
   var allMessages = [];
@@ -247,7 +248,7 @@
       listEl.appendChild(card);
 
       requestAnimationFrame(function () {
-        if (pre.scrollHeight > 120) {
+        if (pre.scrollHeight > COLLAPSE_HEIGHT) {
           toggleBtn.style.display = "inline-block";
         } else {
           contentWrap.classList.remove("collapsed");
