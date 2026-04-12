@@ -128,39 +128,39 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function runEntryRings() {
-    overlay.classList.add('rings');
-
-    const layer = document.createElement('div');
-    layer.className = 'entry-rings-layer';
-    overlay.appendChild(layer);
-
-    const rings = 5;
-    const gap = 140;
-    const ringDur = 760;
-    const total = gap * (rings - 1) + ringDur;
-
-    for (let i = 0; i < rings; i++) {
-      const r = document.createElement('div');
-      r.className = 'entry-ring';
-      r.style.animationDelay = i * gap + 'ms';
-      r.style.borderColor = 'rgba(240, 248, 255, ' + Math.max(0.25, 0.9 - i * 0.13) + ')';
-      layer.appendChild(r);
+    /* Spotlight / flashlight mask transition:
+       1. Fade out the "点击进入" text
+       2. Remove overlay to expose the black body background
+       3. Circle-clip reveal on page-content creates a growing spotlight */
+    const entryContent = overlay.querySelector('.entry-content');
+    if (entryContent) {
+      entryContent.style.transition = 'opacity 0.35s ease';
+      entryContent.style.opacity = '0';
     }
 
+    const revealDelay = 400;   // ms after click before spotlight starts
+    const revealDur   = 2000;  // matches CSS circleRevealOpen duration
+
     const safetyTimer = setTimeout(() => {
-      if (overlay.parentNode) {
-        overlay.remove();
-        finishEntry();
-      }
-    }, total + 600);
+      if (overlay.parentNode) overlay.remove();
+      pageContent.classList.add('revealed');
+      document.body.style.background = 'var(--bg)';
+      finishEntry();
+    }, revealDelay + revealDur + 600);
+
+    setTimeout(() => {
+      // Overlay and body are nearly the same black — removing is seamless
+      if (overlay.parentNode) overlay.remove();
+      pageContent.classList.add('circle-revealing');
+    }, revealDelay);
 
     setTimeout(() => {
       clearTimeout(safetyTimer);
       document.body.style.background = 'var(--bg)';
+      pageContent.classList.remove('circle-revealing');
       pageContent.classList.add('revealed');
-      if (overlay.parentNode) overlay.remove();
       finishEntry();
-    }, total + 60);
+    }, revealDelay + revealDur + 100);
   }
 
   function finishEntry() {
@@ -694,6 +694,15 @@ document.addEventListener('DOMContentLoaded', () => {
     '好啦好啦答案就是夏夏啦 ╮(╯▽╰)╭',
     '你在考验我的耐心吗 (−_−) zzZ',
     '最后提示一次！是！夏！夏！ ╰(‵□′)╯',
+    '喂喂喂！认真一点！ (◣_◢)',
+    '你猜来猜去不累吗？ (˘・_・˘)',
+    '提示已经很明显了吧！ (°ー°〃)',
+    '我都快哭了你知道吗 (;´༎ຶД༎ຶ`)',
+    '到底要输多少次才对啊 (╥_╥)',
+    '不如试试输入我的名字？ (◕‿◕✿)',
+    '你就不能好好对我吗 (ಥ_ಥ)',
+    '再不输对我就不理你了！ (>д<)',
+    '密码就是我呀！夏夏！ ヾ(•ω•`)o',
   ];
 
   contactTrigger?.addEventListener('click', () => {
@@ -733,13 +742,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* After first punishment: show warning messages with kaomoji.
-       wrongInputCount starts at 1 for the first error (which triggers punishment).
-       Subtract 2: -1 because punishment was the 1st error, -1 for 0-based index. */
-    const warningIdx = Math.min(wrongInputCount - 2, wrongInputWarnings.length - 1);
-    const msg = wrongInputWarnings[Math.max(0, warningIdx)];
+       wrongInputCount 2 = first post-punishment error → plain message.
+       wrongInputCount 3+ = subsequent errors → kaomoji messages. */
     contactInput.value = '';
     document.querySelector('#contactInputBlock p').innerHTML = '<strong>输入错误请重新输入</strong>';
-    alert(msg);
+    if (wrongInputCount <= 2) {
+      alert('输入错误请重新输入');
+    } else {
+      const warningIdx = Math.min(wrongInputCount - 3, wrongInputWarnings.length - 1);
+      const msg = wrongInputWarnings[Math.max(0, warningIdx)];
+      alert(msg);
+    }
     contactInput.focus();
   });
 
@@ -750,6 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
     punishConfirm.classList.add('hidden');
     punishMessage.classList.remove('flash', 'show', 'recovery', 'fade-in-msg', 'fade-out-msg');
     punishMessage.textContent = '';
+    punishMessage.style.opacity = '';
     punishOverlay.style.transition = '';
     punishOverlay.style.background = '';
     document.body.classList.remove('no-scroll');
@@ -789,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /* Phase 2: Show red "你" then start fast flashing */
     punishMessage.textContent = '你';
     punishMessage.classList.add('show');
-    await wait(1000);
+    await wait(2000);
 
     /* Start flashing and adding "！" */
     punishMessage.classList.add('flash');
@@ -821,27 +835,29 @@ document.addEventListener('DOMContentLoaded', () => {
       punishMessage.textContent += '！';
     }
 
-    /* Stop flashing, pause 1s */
+    /* Stop flashing, pause 2.5s before text disappears */
     punishMessage.classList.remove('flash');
-    await wait(1000);
+    punishMessage.style.opacity = '1';
+    await wait(2500);
 
     /* Text disappears */
     punishMessage.classList.remove('show');
+    punishMessage.style.opacity = '';
     await wait(500);
     punishMessage.textContent = '';
 
     stopSharpTone();
 
-    /* Phase 3: 30 second black screen - completely non-interactive (required by design) */
-    await wait(30000);
+    /* Phase 3: 30 second black screen — first 20s pure black, then 10s transition */
+    await wait(20000);
 
-    /* Phase 4: Slowly transition from black to theme color */
-    punishOverlay.style.transition = 'background 3s ease';
+    /* Phase 4: Slowly transition from black to theme color (over ~10s) */
+    punishOverlay.style.transition = 'background 10s ease';
     punishOverlay.style.background = 'var(--bg)';
-    await wait(3500);
+    await wait(10500);
 
-    /* Phase 5: Show "哎嘿开个玩笑" then fade out */
-    punishMessage.textContent = '哎嘿开个玩笑';
+    /* Phase 5: Show "开个玩笑" then fade out */
+    punishMessage.textContent = '开个玩笑';
     punishMessage.classList.add('recovery', 'fade-in-msg');
     await wait(2500);
 
