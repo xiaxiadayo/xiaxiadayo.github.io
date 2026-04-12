@@ -756,7 +756,6 @@ document.addEventListener('DOMContentLoaded', () => {
     punishConfirm.classList.add('hidden');
     punishMessage.textContent = '';
     punishMessage.classList.remove('show', 'flash', 'recovery', 'fade-in-msg', 'fade-out-msg');
-    resumeAfterPunish = false;
     startSharpTone();
 
     /* Phase 1: Page goes black slowly (~2s) */
