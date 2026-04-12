@@ -51,8 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let sharpLfoGain = null;
   let resumeAfterPunish = false;
   let bgStartTime = 0;
-  const BG_MUSIC_FADE_IN_MS = 2000;
-  const BG_MUSIC_PLAY_MS = 12000; /* full-volume portion; total ≈ fade-in + play + fade-out */
+  const BG_MUSIC_PLAY_MS = 20000;
   const BG_MUSIC_FADE_MS = 3000;
 
   const BARRAGE_BULLET_COUNT = 56;
@@ -175,15 +174,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bgTimer = window.setInterval(() => {
       const elapsed = Date.now() - bgStartTime;
-      if (elapsed >= BG_MUSIC_FADE_IN_MS + BG_MUSIC_PLAY_MS + BG_MUSIC_FADE_MS) {
+      if (elapsed >= BG_MUSIC_PLAY_MS + BG_MUSIC_FADE_MS) {
         stopBgMusic();
         return;
       }
       let vol = 1;
-      if (elapsed < BG_MUSIC_FADE_IN_MS) {
-        vol = elapsed / BG_MUSIC_FADE_IN_MS;
-      } else if (elapsed >= BG_MUSIC_FADE_IN_MS + BG_MUSIC_PLAY_MS) {
-        vol = Math.max(0, 1 - (elapsed - BG_MUSIC_FADE_IN_MS - BG_MUSIC_PLAY_MS) / BG_MUSIC_FADE_MS);
+      if (elapsed >= BG_MUSIC_PLAY_MS) {
+        vol = Math.max(0, 1 - (elapsed - BG_MUSIC_PLAY_MS) / BG_MUSIC_FADE_MS);
       }
       const i = bgStep % lead.length;
       playTone({ frequency: lead[i], duration: 0.12, volume: 0.03 * vol, type: 'square' });
