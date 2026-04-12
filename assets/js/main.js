@@ -842,9 +842,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startSharpTone() {
     if (sharpOsc) return;
+    punishOverlay.classList.add('strobing');
     const ctx = ensureAudioContext();
     if (!ctx) return;
-    punishOverlay.classList.add('strobing');
 
     sharpOsc = ctx.createOscillator();
     sharpGain = ctx.createGain();
@@ -873,12 +873,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function stopSharpTone() {
     punishOverlay.classList.remove('strobing');
     if (sharpOsc) {
-      try { sharpOsc.stop(); } catch {}
+      try { sharpOsc.stop(); } catch (error) { void error; }
       sharpOsc.disconnect();
       sharpOsc = null;
     }
     if (sharpLfo) {
-      try { sharpLfo.stop(); } catch {}
+      try { sharpLfo.stop(); } catch (error) { void error; }
       sharpLfo.disconnect();
       sharpLfo = null;
     }
