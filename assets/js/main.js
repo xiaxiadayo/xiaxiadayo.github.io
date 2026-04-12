@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pageContent.classList.remove('revealing');
       pageContent.classList.add('revealed');
       document.body.style.background = '#F0F8FF';
+      document.body.classList.remove('no-scroll');
 
       /* Show music player & cat */
       musicPlayer.classList.remove('hidden');
@@ -67,18 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* Sync state if music ends/errors */
-  bgMusic.addEventListener('pause', () => {
-    if (!bgMusic.ended) return;
+  /* Sync state when music ends */
+  bgMusic.addEventListener('ended', () => {
     musicPlaying = false;
     musicIcon.textContent = '▶';
     musicEq.classList.remove('playing');
   });
 
   /* ---------- 3. Cat Pet ---------- */
-  const catNormal = '  \u2227,,,\u2227\n( \u0333\u2022 \u00b7 \u2022 \u0333)\n /    \u3065\u2661';
-  const catHappy = '  \u2227,,,\u2227\n( \u0333\u2267\u03c9\u2266 \u0333)\n /    \u3065\u2728';
-  const catSleepy = '  \u2227,,,\u2227\n( \u0333\u2013 \u03c9 \u2013 \u0333)\n /    \u3065\ud83d\udca4';
+  /* Cat expressions: Normal = (• · •), Happy = (≧ω≦), Sleepy = (– ω –) */
+  const catNormal = '  ∧,,,∧\n( ̳• · • ̳)\n /    づ♡';
+  const catHappy = '  ∧,,,∧\n( ̳≧ω≦ ̳)\n /    づ✨';
+  const catSleepy = '  ∧,,,∧\n( ̳– ω – ̳)\n /    づ💤';
 
   const catMessages = [
     '喵~',
