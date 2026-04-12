@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>夏夏的小窝 🌸</title>
-  <meta name="description" content="欢迎来到夏夏的可爱小窝～一个充满温暖与可爱的个人空间 ✨" />
+  <title>夏夏的留言板</title>
+  <meta name="description" content="夏夏的公共留言板 — 欢迎留言" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" sizes="32x32" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
@@ -18,384 +18,62 @@
   <!-- ===== Navigation ===== -->
   <nav class="navbar" id="navbar">
     <div class="nav-content">
-      <a href="#" class="nav-logo">
-        <span class="logo-emoji">🌸</span>
-        夏夏的小窝
-      </a>
-      <button class="menu-toggle" id="menuToggle" aria-label="切换菜单">☰</button>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#home">🏠 首页</a></li>
-        <li><a href="#about">🌟 关于我</a></li>
-        <li><a href="#hobbies">🎀 兴趣爱好</a></li>
-        <li><a href="#tribute">🐱 猫羽雫</a></li>
-        <li><a href="#game">🎮 小游戏</a></li>
-        <li><a href="#gallery">🎨 心情小记</a></li>
-        <li><a href="#contact">💌 找到我</a></li>
-      </ul>
+      <a href="#" class="nav-logo">夏夏的留言板</a>
+      <div class="nav-right">
+        <span id="mbAdminStatus" class="admin-status"></span>
+        <button class="btn btn-small" id="mbAdminBtn">管理</button>
+      </div>
     </div>
   </nav>
 
   <!-- ===== Hero ===== -->
-  <section class="hero" id="home">
-    <span class="floating-deco">✦</span>
-    <span class="floating-deco">⭐</span>
-    <span class="floating-deco">🌙</span>
-    <span class="floating-deco">🐱</span>
-    <span class="floating-deco">🎵</span>
-
+  <section class="hero">
     <div class="hero-content">
-      <div class="hero-avatar">🐱</div>
-      <h1>你好呀 <span class="wave">👋</span></h1>
-      <h1>欢迎来到夏夏的小窝</h1>
-      <p class="subtitle">
-        这里是一个温暖可爱的二次元小角落 🌈<br />
-        记录生活中的美好瞬间，分享快乐与感动 ✨<br />
-        —— 致敬猫羽雫 🐾
-      </p>
-      <div class="hero-buttons">
-        <a href="#about" class="btn btn-primary">🌟 了解更多</a>
-        <a href="#game" class="btn btn-secondary">🎮 玩小游戏</a>
-      </div>
+      <h1>留言板</h1>
+      <p class="subtitle">在这里留下你想说的话，所有人都能看到。</p>
     </div>
   </section>
 
-  <!-- ===== About ===== -->
-  <section class="section" id="about">
-    <div class="about-section fade-in">
-      <div class="section-title">
-        <span class="section-emoji">🌟</span>
-        <h2>关于我</h2>
-        <p>来认识一下夏夏吧～</p>
-      </div>
-
-      <div class="about-grid">
-        <div class="about-text">
-          <h3>嗨！我是夏夏 🌻</h3>
-          <p>
-            一个热爱生活的小可爱～喜欢在阳光下散步，喜欢雨后的彩虹，
-            也喜欢窝在沙发上看一部温暖的电影。每天都在努力变成更好的自己！
-          </p>
-          <p>
-            这个小站是我的秘密花园 🌺，在这里我会记录生活的点点滴滴，
-            分享让我开心的事情，也希望能给来到这里的你带来一丝温暖和快乐～
-          </p>
-        </div>
-        <div class="about-info-cards">
-          <div class="info-card">
-            <span class="info-emoji">🎂</span>
-            <span class="info-label">星座</span>
-            <span class="info-value">双鱼座 ♓</span>
-          </div>
-          <div class="info-card">
-            <span class="info-emoji">📍</span>
-            <span class="info-label">位置</span>
-            <span class="info-value">地球某个角落</span>
-          </div>
-          <div class="info-card">
-            <span class="info-emoji">💖</span>
-            <span class="info-label">性格</span>
-            <span class="info-value">温柔又可爱</span>
-          </div>
-          <div class="info-card">
-            <span class="info-emoji">🎯</span>
-            <span class="info-label">目标</span>
-            <span class="info-value">每天开心！</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== Hobbies ===== -->
-  <section class="section" id="hobbies">
-    <div class="section-title fade-in">
-      <span class="section-emoji">🎀</span>
-      <h2>兴趣爱好</h2>
-      <p>这些都是让我快乐的小事情～</p>
+  <!-- ===== Message Form ===== -->
+  <main class="main-content">
+    <div id="mbLocalWarning" class="local-warning" style="display:none;">
+      当前为本地模式：留言仅保存在本浏览器中，其他设备无法看到。如需所有人可见，请配置 Supabase 后端（参见
+      <a href="https://github.com/xiaxiadayo/xiaxiadayo.github.io#readme">README</a>）。
     </div>
 
-    <div class="hobbies-grid">
-      <div class="hobby-card fade-in">
-        <span class="hobby-icon">📚</span>
-        <h3>阅读</h3>
-        <p>喜欢翻开一本好书，沉浸在文字的世界里，感受不同的故事与人生</p>
+    <form id="mbForm" class="mb-form" autocomplete="off">
+      <div class="mb-form-row">
+        <label for="mbAuthor">署名</label>
+        <input type="text" id="mbAuthor" placeholder="你的名字" required />
       </div>
-      <div class="hobby-card fade-in">
-        <span class="hobby-icon">🎵</span>
-        <h3>听音乐</h3>
-        <p>音乐是生活的调味剂～无论开心还是难过，总有一首歌能懂我</p>
+      <div class="mb-form-row">
+        <label for="mbContent">留言内容</label>
+        <textarea id="mbContent" rows="5" placeholder="写下你想说的话…" required></textarea>
       </div>
-      <div class="hobby-card fade-in">
-        <span class="hobby-icon">🎨</span>
-        <h3>画画</h3>
-        <p>用画笔记录美好瞬间，把看到的可爱事物都画下来</p>
-      </div>
-      <div class="hobby-card fade-in">
-        <span class="hobby-icon">🍰</span>
-        <h3>烘焙</h3>
-        <p>制作甜甜的蛋糕和饼干，幸福的味道从烤箱里飘出来～</p>
-      </div>
-      <div class="hobby-card fade-in">
-        <span class="hobby-icon">📷</span>
-        <h3>摄影</h3>
-        <p>记录生活中的每一个精彩瞬间，用镜头捕捉世界的美</p>
-      </div>
-      <div class="hobby-card fade-in">
-        <span class="hobby-icon">🌱</span>
-        <h3>种花</h3>
-        <p>在小阳台上养一些花花草草，看着它们慢慢长大特别治愈</p>
-      </div>
-    </div>
-  </section>
+      <button type="submit" class="btn btn-primary">发布留言</button>
+    </form>
 
-  <!-- ===== Fun Facts ===== -->
-  <div class="facts-section">
-    <div class="section-title fade-in">
-      <span class="section-emoji">✨</span>
-      <h2>关于夏夏的小秘密</h2>
-      <p>一些有趣的小事情～</p>
-    </div>
+    <!-- ===== Message List ===== -->
+    <div id="mbList" class="mb-list"></div>
+    <div id="mbPagination" class="mb-pagination"></div>
+  </main>
 
-    <div class="facts-grid">
-      <div class="fact-item fade-in">
-        <span class="fact-emoji">🐱</span>
-        <div>
-          <h4>猫咪爱好者</h4>
-          <p>看到可爱的猫咪就走不动路了！最喜欢橘猫和布偶猫～</p>
-        </div>
-      </div>
-      <div class="fact-item fade-in">
-        <span class="fact-emoji">🌙</span>
-        <div>
-          <h4>夜猫子</h4>
-          <p>夜晚是灵感最多的时候，喜欢在安静的夜里做自己喜欢的事</p>
-        </div>
-      </div>
-      <div class="fact-item fade-in">
-        <span class="fact-emoji">🧋</span>
-        <div>
-          <h4>奶茶重度爱好者</h4>
-          <p>三分糖少冰加珍珠是我的固定搭配！一周不喝奶茶就会很想念</p>
-        </div>
-      </div>
-      <div class="fact-item fade-in">
-        <span class="fact-emoji">🎮</span>
-        <div>
-          <h4>佛系游戏玩家</h4>
-          <p>喜欢治愈系的游戏，比如动物森友会和星露谷物语～</p>
-        </div>
-      </div>
-      <div class="fact-item fade-in">
-        <span class="fact-emoji">🌸</span>
-        <div>
-          <h4>樱花季粉丝</h4>
-          <p>每年春天最期待的就是赏樱花，粉粉的花瓣好浪漫～</p>
-        </div>
-      </div>
-      <div class="fact-item fade-in">
-        <span class="fact-emoji">📝</span>
-        <div>
-          <h4>手账达人</h4>
-          <p>用可爱的贴纸和彩笔记录每一天，翻看时满满的回忆～</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Anime Tribute Section ===== -->
-  <section class="section tribute-section" id="tribute">
-    <div class="section-title fade-in">
-      <span class="section-emoji">🐱</span>
-      <h2>猫羽雫 · 致敬</h2>
-      <p>致敬我最喜欢的二次元角色～以下是原创抽象风格插画 🎨</p>
-    </div>
-
-    <div class="tribute-grid">
-      <div class="tribute-card fade-in">
-        <img src="/assets/images/neko-silhouette.svg" alt="抽象猫咪剪影 - 致敬猫羽雫" loading="lazy" />
-        <div class="tribute-caption">✦ 星光下的猫咪 · 致敬猫羽雫</div>
-      </div>
-      <div class="tribute-card fade-in">
-        <img src="/assets/images/cat-ears-deco.svg" alt="猫耳装饰 - 淡蓝色主题" loading="lazy" />
-        <div class="tribute-caption">🎀 猫耳装饰 · 淡蓝梦境</div>
-      </div>
-      <div class="tribute-card fade-in">
-        <img src="/assets/images/starry-bg.svg" alt="星空背景 - 二次元风格" loading="lazy" />
-        <div class="tribute-caption">🌙 星空与月光 · 二次元风</div>
-      </div>
-    </div>
-
-    <p class="fade-in" style="text-align:center; margin-top:1.5rem; color:var(--text-light); font-size:0.85rem;">
-      以上均为原创抽象风格插画（非官方素材）。若希望替换为您自己的图片，请将图片放入 <code>/assets/images/</code> 目录并更新 HTML 中的 <code>src</code> 路径。
-    </p>
-  </section>
-
-  <!-- ===== Mini Game Section ===== -->
-  <section class="section game-section" id="game">
-    <div class="section-title fade-in">
-      <span class="section-emoji">🎮</span>
-      <h2>星之猫 ✦ 小游戏</h2>
-      <p>控制小猫咪收集星星和音符，避开雨云！键盘 ← → ↑ ↓ 或触屏移动 🐾</p>
-    </div>
-
-    <div class="game-wrapper fade-in">
-      <div class="game-header">
-        <div class="game-info">
-          <span>✦ 得分: <strong id="gameScore">0</strong></span>
-          <span id="gameLives">❤️❤️❤️❤️❤️</span>
-        </div>
-        <div class="game-controls">
-          <button class="btn btn-primary" id="btnStart" onclick="gameStart()">🎮 开始游戏</button>
-          <button class="btn btn-secondary" id="btnPause" onclick="gamePause()">⏸ 暂停</button>
-        </div>
-      </div>
-      <canvas id="gameCanvas"></canvas>
-      <div class="game-hint">⭐ 收集星星 (+10) · 🎵 收集音符 (+15) · 🌧️ 避开雨云 (-20 & 失去一条命) · 空格键 开始/暂停</div>
-    </div>
-  </section>
-
-  <!-- ===== Gallery / Mood ===== -->
-  <section class="section" id="gallery">
-    <div class="section-title fade-in">
-      <span class="section-emoji">🎨</span>
-      <h2>心情小记</h2>
-      <p>生活中值得记录的美好瞬间～</p>
-    </div>
-
-    <div class="gallery-grid">
-      <div class="gallery-card fade-in">
-        <div class="card-image">🌅</div>
-        <div class="card-content">
-          <h3>日落时分</h3>
-          <p>今天的晚霞好美，橙色和粉色交织在一起，像一幅水彩画</p>
-        </div>
-      </div>
-      <div class="gallery-card fade-in">
-        <div class="card-image">☕</div>
-        <div class="card-content">
-          <h3>午后咖啡</h3>
-          <p>阳光透过窗户洒在桌上，配上一杯拿铁，完美的午后时光</p>
-        </div>
-      </div>
-      <div class="gallery-card fade-in">
-        <div class="card-image">🌺</div>
-        <div class="card-content">
-          <h3>花儿开了</h3>
-          <p>阳台上的小花终于开了！等了好久好久，开心得想转圈圈</p>
-        </div>
-      </div>
-      <div class="gallery-card fade-in">
-        <div class="card-image">🌈</div>
-        <div class="card-content">
-          <h3>雨后彩虹</h3>
-          <p>下完雨看到了一道好大的彩虹，感觉世界都变得温柔了</p>
-        </div>
-      </div>
-      <div class="gallery-card fade-in">
-        <div class="card-image">🎂</div>
-        <div class="card-content">
-          <h3>生日快乐</h3>
-          <p>自己做了一个草莓蛋糕，虽然歪歪扭扭但是超级好吃！</p>
-        </div>
-      </div>
-      <div class="gallery-card fade-in">
-        <div class="card-image">🌙</div>
-        <div class="card-content">
-          <h3>月色真美</h3>
-          <p>今晚的月亮又大又圆，散步时看到的，心情特别好～</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== Contact / Message ===== -->
-  <section class="section" id="contact">
-    <div class="message-section fade-in">
-      <span class="message-emoji">💌</span>
-      <h3>想找到我？</h3>
-      <p>欢迎通过以下方式联系夏夏，一起聊聊天吧！每一条消息我都会认真回复的哦～</p>
-
-      <div class="social-links">
-        <a href="https://github.com/xiaxiadayo" target="_blank" rel="noopener noreferrer" class="social-link">
-          🐙 GitHub
-        </a>
-        <a href="mailto:hello@example.com" class="social-link">
-          📧 邮箱
-        </a>
-        <a href="#" class="social-link">
-          🐦 微博
-        </a>
-        <a href="#" class="social-link">
-          💬 微信
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== Music Player (vertical bar, bottom-right) ===== -->
-  <div class="music-prompt" id="musicPrompt">
-    <span class="prompt-text">🎵 点击以开启音乐</span>
-  </div>
-
-  <div class="music-player" id="musicPlayer">
-    <div class="mp-title" id="mpTitle">Dreamy Afternoon</div>
-    <div class="mp-bars" id="mpBars"></div>
-    <button class="mp-btn" id="mpPrev" aria-label="上一首" title="上一首 (B)">⏮</button>
-    <button class="mp-btn" id="mpPlay" aria-label="播放/暂停" title="播放/暂停 (M)">▶</button>
-    <button class="mp-btn" id="mpNext" aria-label="下一首" title="下一首 (N)">⏭</button>
-    <input type="range" class="mp-volume" id="mpVolume" min="0" max="100" value="50" aria-label="音量" title="音量" />
-  </div>
+  <!-- ===== Toast ===== -->
+  <div id="mbToast" class="mb-toast"></div>
 
   <!-- ===== Footer ===== -->
   <footer class="footer">
-    <p>用 <span class="footer-emoji">💖</span> 制作 | 夏夏的小窝 · 致敬猫羽雫 🐱</p>
-    <p>© 2024 - 2026 xiaxiadayo · 保持快乐，保持可爱 <span class="footer-emoji">✦</span></p>
-    <p style="font-size:0.75rem; margin-top:0.5rem; opacity:0.7;">
-      插画为原创抽象风格（非官方素材）· 音乐占位文件请自行替换为 CC0/免费 lofi 音乐 ·
-      详见 <a href="https://github.com/xiaxiadayo/xiaxiadayo.github.io#readme" style="color:var(--primary-dark);text-decoration:underline;">README</a>
-    </p>
+    <p>© 2024 – 2026 xiaxiadayo</p>
   </footer>
 
   <!-- ===== Scripts ===== -->
-  <script src="/assets/js/game.js" defer></script>
-  <script src="/assets/js/player.js" defer></script>
+  <script src="/config.js"></script>
+  <script src="/assets/js/messageboard.js" defer></script>
   <script>
-    // Navbar scroll effect
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    // Navbar scroll shadow
+    window.addEventListener('scroll', function () {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
     });
-
-    // Mobile menu toggle
-    const menuToggle = document.getElementById('menuToggle');
-    const navLinks = document.getElementById('navLinks');
-    menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-    });
-
-    // Close menu on link click
-    navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        navLinks.classList.remove('active');
-      });
-    });
-
-    // Scroll-triggered fade-in
-    const fadeElements = document.querySelectorAll('.fade-in');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          entry.target.style.animation = `fade-in-up 0.8s ease ${index * 0.08}s forwards`;
-          observer.unobserve(entry.target);
-        }
-      });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    });
-
-    fadeElements.forEach(el => observer.observe(el));
   </script>
 </body>
 </html>
