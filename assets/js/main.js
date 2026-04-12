@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     catMoodIndex += 1;
     setTimeout(() => {
       catArt.textContent = catHappy;
-    }, 500);
+    }, 550);
 
     clearTimeout(bubbleTimer);
     bubbleTimer = setTimeout(() => {
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
     punishMessage.textContent = '你';
     punishMessage.classList.add('show', 'flash');
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 15; i++) {
       await wait(110);
       punishMessage.textContent += '！';
     }
