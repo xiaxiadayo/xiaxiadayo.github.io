@@ -27,6 +27,8 @@
         <li><a href="#home">🏠 首页</a></li>
         <li><a href="#about">🌟 关于我</a></li>
         <li><a href="#hobbies">🎀 兴趣爱好</a></li>
+        <li><a href="#tribute">🐱 猫羽雫</a></li>
+        <li><a href="#game">🎮 小游戏</a></li>
         <li><a href="#gallery">🎨 心情小记</a></li>
         <li><a href="#contact">💌 找到我</a></li>
       </ul>
@@ -35,23 +37,24 @@
 
   <!-- ===== Hero ===== -->
   <section class="hero" id="home">
-    <span class="floating-deco">🌸</span>
+    <span class="floating-deco">✦</span>
     <span class="floating-deco">⭐</span>
     <span class="floating-deco">🌙</span>
-    <span class="floating-deco">🦋</span>
-    <span class="floating-deco">🌷</span>
+    <span class="floating-deco">🐱</span>
+    <span class="floating-deco">🎵</span>
 
     <div class="hero-content">
       <div class="hero-avatar">🐱</div>
       <h1>你好呀 <span class="wave">👋</span></h1>
       <h1>欢迎来到夏夏的小窝</h1>
       <p class="subtitle">
-        这里是一个温暖可爱的小角落 🌈<br />
-        记录生活中的美好瞬间，分享快乐与感动 ✨
+        这里是一个温暖可爱的二次元小角落 🌈<br />
+        记录生活中的美好瞬间，分享快乐与感动 ✨<br />
+        —— 致敬猫羽雫 🐾
       </p>
       <div class="hero-buttons">
         <a href="#about" class="btn btn-primary">🌟 了解更多</a>
-        <a href="#contact" class="btn btn-secondary">💌 联系我</a>
+        <a href="#game" class="btn btn-secondary">🎮 玩小游戏</a>
       </div>
     </div>
   </section>
@@ -199,6 +202,58 @@
     </div>
   </div>
 
+  <!-- ===== Anime Tribute Section ===== -->
+  <section class="section tribute-section" id="tribute">
+    <div class="section-title fade-in">
+      <span class="section-emoji">🐱</span>
+      <h2>猫羽雫 · 致敬</h2>
+      <p>致敬我最喜欢的二次元角色～以下是原创抽象风格插画 🎨</p>
+    </div>
+
+    <div class="tribute-grid">
+      <div class="tribute-card fade-in">
+        <img src="/assets/images/neko-silhouette.svg" alt="抽象猫咪剪影 - 致敬猫羽雫" loading="lazy" />
+        <div class="tribute-caption">✦ 星光下的猫咪 · 致敬猫羽雫</div>
+      </div>
+      <div class="tribute-card fade-in">
+        <img src="/assets/images/cat-ears-deco.svg" alt="猫耳装饰 - 淡蓝色主题" loading="lazy" />
+        <div class="tribute-caption">🎀 猫耳装饰 · 淡蓝梦境</div>
+      </div>
+      <div class="tribute-card fade-in">
+        <img src="/assets/images/starry-bg.svg" alt="星空背景 - 二次元风格" loading="lazy" />
+        <div class="tribute-caption">🌙 星空与月光 · 二次元风</div>
+      </div>
+    </div>
+
+    <p class="fade-in" style="text-align:center; margin-top:1.5rem; color:var(--text-light); font-size:0.85rem;">
+      以上均为原创抽象风格插画（非官方素材）。若希望替换为您自己的图片，请将图片放入 <code>/assets/images/</code> 目录并更新 HTML 中的 <code>src</code> 路径。
+    </p>
+  </section>
+
+  <!-- ===== Mini Game Section ===== -->
+  <section class="section game-section" id="game">
+    <div class="section-title fade-in">
+      <span class="section-emoji">🎮</span>
+      <h2>星之猫 ✦ 小游戏</h2>
+      <p>控制小猫咪收集星星和音符，避开雨云！键盘 ← → ↑ ↓ 或触屏移动 🐾</p>
+    </div>
+
+    <div class="game-wrapper fade-in">
+      <div class="game-header">
+        <div class="game-info">
+          <span>✦ 得分: <strong id="gameScore">0</strong></span>
+          <span id="gameLives">❤️❤️❤️❤️❤️</span>
+        </div>
+        <div class="game-controls">
+          <button class="btn btn-primary" id="btnStart" onclick="gameStart()">🎮 开始游戏</button>
+          <button class="btn btn-secondary" id="btnPause" onclick="gamePause()">⏸ 暂停</button>
+        </div>
+      </div>
+      <canvas id="gameCanvas"></canvas>
+      <div class="game-hint">⭐ 收集星星 (+10) · 🎵 收集音符 (+15) · 🌧️ 避开雨云 (-20 & 失去一条命) · 空格键 开始/暂停</div>
+    </div>
+  </section>
+
   <!-- ===== Gallery / Mood ===== -->
   <section class="section" id="gallery">
     <div class="section-title fade-in">
@@ -277,13 +332,33 @@
     </div>
   </section>
 
+  <!-- ===== Music Player (vertical bar, bottom-right) ===== -->
+  <div class="music-prompt" id="musicPrompt">
+    <span class="prompt-text">🎵 点击以开启音乐</span>
+  </div>
+
+  <div class="music-player" id="musicPlayer">
+    <div class="mp-title" id="mpTitle">Dreamy Afternoon</div>
+    <div class="mp-bars" id="mpBars"></div>
+    <button class="mp-btn" id="mpPrev" aria-label="上一首" title="上一首 (B)">⏮</button>
+    <button class="mp-btn" id="mpPlay" aria-label="播放/暂停" title="播放/暂停 (M)">▶</button>
+    <button class="mp-btn" id="mpNext" aria-label="下一首" title="下一首 (N)">⏭</button>
+    <input type="range" class="mp-volume" id="mpVolume" min="0" max="100" value="50" aria-label="音量" title="音量" />
+  </div>
+
   <!-- ===== Footer ===== -->
   <footer class="footer">
-    <p>用 <span class="footer-emoji">💖</span> 制作 | 夏夏的小窝</p>
-    <p>© 2024 - 2026 xiaxiadayo · 保持快乐，保持可爱 <span class="footer-emoji">🌸</span></p>
+    <p>用 <span class="footer-emoji">💖</span> 制作 | 夏夏的小窝 · 致敬猫羽雫 🐱</p>
+    <p>© 2024 - 2026 xiaxiadayo · 保持快乐，保持可爱 <span class="footer-emoji">✦</span></p>
+    <p style="font-size:0.75rem; margin-top:0.5rem; opacity:0.7;">
+      插画为原创抽象风格（非官方素材）· 音乐占位文件请自行替换为 CC0/免费 lofi 音乐 ·
+      详见 <a href="https://github.com/xiaxiadayo/xiaxiadayo.github.io#readme" style="color:var(--primary-dark);text-decoration:underline;">README</a>
+    </p>
   </footer>
 
   <!-- ===== Scripts ===== -->
+  <script src="/assets/js/game.js" defer></script>
+  <script src="/assets/js/player.js" defer></script>
   <script>
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');

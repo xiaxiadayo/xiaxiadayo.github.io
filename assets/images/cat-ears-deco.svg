@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" fill="none">
+  <!-- Abstract cat ears decoration - original artwork, sky-blue theme -->
+  <defs>
+    <linearGradient id="earGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b3ddf2"/>
+      <stop offset="100%" stop-color="#e0f0ff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Left ear -->
+  <path d="M40 100 L20 30 Q30 10 50 25 L65 100 Z" fill="url(#earGrad)" stroke="#89c4e1" stroke-width="2" filter="url(#glow)"/>
+  <!-- Right ear -->
+  <path d="M135 100 L150 25 Q170 10 180 30 L160 100 Z" fill="url(#earGrad)" stroke="#89c4e1" stroke-width="2" filter="url(#glow)"/>
+  <!-- Inner left ear -->
+  <path d="M45 90 L30 40 Q38 25 50 35 L58 90 Z" fill="#d4eeff" opacity="0.7"/>
+  <!-- Inner right ear -->
+  <path d="M142 90 L152 35 Q162 25 170 40 L155 90 Z" fill="#d4eeff" opacity="0.7"/>
+  <!-- Head curve -->
+  <ellipse cx="100" cy="105" rx="65" ry="20" fill="url(#earGrad)" stroke="#89c4e1" stroke-width="2"/>
+  <!-- Sparkles -->
+  <circle cx="35" cy="20" r="2" fill="#ffd700" opacity="0.8"/>
+  <circle cx="170" cy="18" r="1.5" fill="#ffd700" opacity="0.6"/>
+  <circle cx="100" cy="8" r="2.5" fill="#ffd700" opacity="0.7"/>
+</svg>
