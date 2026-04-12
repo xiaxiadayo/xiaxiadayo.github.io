@@ -110,7 +110,7 @@ img { display: block; max-width: 100%; }
   background: var(--bg);
   min-height: 100vh;
   visibility: hidden;
-  clip-path: circle(0% at 50% 50vh);
+  clip-path: circle(0% at 50% 50%);
 }
 
 .page-content.circle-revealing {
@@ -124,8 +124,8 @@ img { display: block; max-width: 100%; }
 }
 
 @keyframes circleRevealOpen {
-  0% { clip-path: circle(0% at 50% 50vh); }
-  100% { clip-path: circle(150% at 50% 50vh); }
+  0% { clip-path: circle(0% at 50% 50%); }
+  100% { clip-path: circle(150% at 50% 50%); }
 }
 
 /* ===== Hero Section ===== */
