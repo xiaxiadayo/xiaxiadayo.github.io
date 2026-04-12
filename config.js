@@ -47,13 +47,13 @@
 
 const MESSAGE_BOARD_CONFIG = {
   /** "supabase" or "local" */
-  STORAGE_BACKEND: "local",
+  STORAGE_BACKEND: "supabase",
 
   /** Supabase project URL (e.g. "https://xxxxx.supabase.co") */
-  SUPABASE_URL: "",
+  SUPABASE_URL: "https://aswowaalfwpaffcyokuh.supabase.co",
 
   /** Supabase anon / public key */
-  SUPABASE_ANON_KEY: "",
+  SUPABASE_ANON_KEY: "sb_publishable_LXDRu0OGEjp4LUkUjXxRWQ_nuSgLzip",
 
   /** Admin password for deleting messages (front-end only, NOT secure) */
   ADMIN_PASSWORD: "xiaxia"
