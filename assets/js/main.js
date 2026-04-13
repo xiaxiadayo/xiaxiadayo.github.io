@@ -122,13 +122,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const mobileEntrySafeMode =
-    window.matchMedia('(max-width: 900px)').matches
-    || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  function isMobileEntrySafeMode() {
+    return window.matchMedia('(max-width: 900px)').matches
+      || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  }
 
   /* ---------- 1. Entry Overlay (flicker fix) ---------- */
   overlay.addEventListener('click', () => {
-    const animBlocked = reducedMotion || mobileEntrySafeMode || cssAnimationsBlocked();
+    const animBlocked = reducedMotion || isMobileEntrySafeMode() || cssAnimationsBlocked();
 
     startBgMusic();
 
