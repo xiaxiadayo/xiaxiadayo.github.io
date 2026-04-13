@@ -122,10 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobileEntrySafeMode = window.matchMedia('(max-width: 900px), (hover: none) and (pointer: coarse)').matches;
 
   /* ---------- 1. Entry Overlay (flicker fix) ---------- */
   overlay.addEventListener('click', () => {
-    const animBlocked = reducedMotion || cssAnimationsBlocked();
+    const animBlocked = reducedMotion || mobileEntrySafeMode || cssAnimationsBlocked();
 
     startBgMusic();
 
