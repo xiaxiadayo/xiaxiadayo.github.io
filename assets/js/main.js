@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const musicToggle = document.getElementById('musicToggle');
   const musicIcon = document.getElementById('musicIcon');
   const musicEq = document.getElementById('musicEq');
+  const musicTitle = document.getElementById('musicTitle');
+  const musicPrev = document.getElementById('musicPrev');
+  const musicNext = document.getElementById('musicNext');
   const catPet = document.getElementById('catPet');
   const catArt = document.getElementById('catArt');
   const catBubble = document.getElementById('catBubble');
@@ -35,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const punishOverlay = document.getElementById('punishOverlay');
   const punishMessage = document.getElementById('punishMessage');
   const punishConfirm = document.getElementById('punishConfirm');
+  const themeCycleBtn = document.getElementById('themeCycleBtn');
+  const companion = document.getElementById('companion');
+  const companionFace = document.getElementById('companionFace');
 
   let musicPlaying = false;
   const verifiedKey = 'xiaxia_contact_verified';
@@ -54,13 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const BG_MUSIC_PLAY_MS = 20000;
   const BG_MUSIC_FADE_MS = 3000;
 
+  const themeOrder = ['morning', 'noon', 'dusk', 'night'];
+  const themeIcons = { morning: '🌅', noon: '☀', dusk: '🌇', night: '🌙' };
+  const companionEmojis = { morning: '✿', noon: '☀', dusk: '🍂', night: '💤' };
   let currentTheme = 'auto';
   let resolvedTheme = 'noon';
-  let catThemeTimer = null;
-  let savedThemeBeforeCat = null;
   let rainActive = false;
   let rainContainer = null;
   let goldenLightActive = false;
+  let morningLightEl = null;
+  let moonLightEl = null;
+  let autoMelodyTimer = null;
 
   const BARRAGE_BULLET_COUNT = 56;
 
@@ -111,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- 1. Entry Overlay ---------- */
+  /* ---------- 1. Entry Overlay (flicker fix) ---------- */
   overlay.addEventListener('click', () => {
     const animBlocked = reducedMotion || cssAnimationsBlocked();
 
@@ -120,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('no-scroll');
     musicPlayer.classList.remove('hidden');
     catPet.classList.remove('hidden');
+    if (companion) companion.classList.remove('hidden');
 
     if (animBlocked) {
       overlay.classList.add('anim-fallback');
@@ -136,18 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function runEntryRings() {
-    /* Spotlight / flashlight mask transition:
-       1. Fade out the "点击进入" text
-       2. Remove overlay to expose the black body background
-       3. Circle-clip reveal on page-content creates a growing spotlight */
     const entryContent = overlay.querySelector('.entry-content');
     if (entryContent) {
       entryContent.style.transition = 'opacity 0.35s ease';
       entryContent.style.opacity = '0';
     }
 
-    const revealDelay = 400;   // ms after click before spotlight starts
-    const revealDur   = 2000;  // matches CSS circleRevealOpen duration
+    const revealDelay = 400;
+    const revealDur   = 2000;
 
     const safetyTimer = setTimeout(() => {
       if (overlay.parentNode) overlay.remove();
@@ -157,16 +164,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }, revealDelay + revealDur + 600);
 
     setTimeout(() => {
-      // Overlay and body are nearly the same black — removing is seamless
-      if (overlay.parentNode) overlay.remove();
+      /* Fix flicker: fade overlay out instead of instant remove */
+      overlay.style.transition = 'opacity 0.3s ease';
+      overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none';
       pageContent.classList.add('circle-revealing');
-      // Trigger hero fade-in immediately as circle reveal starts
       const heroInner = document.querySelector('.hero-inner.fade-in');
       if (heroInner) heroInner.classList.add('visible');
     }, revealDelay);
 
     setTimeout(() => {
       clearTimeout(safetyTimer);
+      if (overlay.parentNode) overlay.remove();
       document.body.style.background = 'var(--bg)';
       pageContent.classList.remove('circle-revealing');
       pageContent.classList.add('revealed');
@@ -179,30 +188,61 @@ document.addEventListener('DOMContentLoaded', () => {
     observeFadeIns();
   }
 
-  /* ---------- 2. Music Player Controls (8-bit) ---------- */
+  /* ---------- 2. Multi-Song Music Player ---------- */
+  const songs = [
+    {
+      name: '晨间轻语',
+      lead: [523.25, 587.33, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33,
+             523.25, 659.25, 783.99, 880.00, 1046.50, 880.00, 783.99, 659.25],
+      bass: [130.81, 130.81, 164.81, 164.81, 196.00, 196.00, 164.81, 164.81,
+             130.81, 130.81, 196.00, 196.00, 261.63, 261.63, 196.00, 196.00],
+      tempo: 200,
+    },
+    {
+      name: '午后微风',
+      lead: [659.25, 783.99, 987.77, 783.99, 659.25, 587.33, 523.25, 587.33,
+             659.25, 783.99, 880.00, 783.99, 659.25, 587.33, 523.25, 493.88],
+      bass: [164.81, 164.81, 196.00, 196.00, 130.81, 130.81, 146.83, 146.83,
+             174.61, 174.61, 196.00, 196.00, 130.81, 130.81, 123.47, 123.47],
+      tempo: 180,
+    },
+    {
+      name: '黄昏散步',
+      lead: [440.00, 523.25, 659.25, 523.25, 440.00, 392.00, 329.63, 392.00,
+             440.00, 523.25, 587.33, 659.25, 587.33, 523.25, 440.00, 392.00],
+      bass: [110.00, 110.00, 130.81, 130.81, 146.83, 146.83, 130.81, 130.81,
+             110.00, 110.00, 146.83, 146.83, 164.81, 164.81, 110.00, 110.00],
+      tempo: 220,
+    },
+    {
+      name: '星空摇篮',
+      lead: [392.00, 440.00, 523.25, 659.25, 587.33, 523.25, 440.00, 392.00,
+             329.63, 392.00, 440.00, 523.25, 587.33, 523.25, 440.00, 329.63],
+      bass: [98.00, 98.00, 110.00, 110.00, 130.81, 130.81, 110.00, 110.00,
+             82.41, 82.41, 110.00, 110.00, 146.83, 146.83, 110.00, 110.00],
+      tempo: 240,
+    },
+  ];
+
+  let currentSongIndex = 0;
+
   function setMusicState(isPlaying) {
     musicPlaying = isPlaying;
     musicIcon.textContent = isPlaying ? '⏸' : '▶';
     musicEq.classList.toggle('playing', isPlaying);
   }
 
+  function updateSongDisplay() {
+    if (musicTitle) musicTitle.textContent = songs[currentSongIndex].name;
+  }
+
   function startBgMusic() {
     if (bgTimer) return;
     ensureAudioContext();
     bgStartTime = Date.now();
+    updateSongDisplay();
 
-    const lead = [
-      659.25, 783.99, 987.77, 783.99,
-      659.25, 587.33, 523.25, 587.33,
-      659.25, 783.99, 880.0, 783.99,
-      659.25, 587.33, 523.25, 493.88,
-    ];
-    const bass = [
-      164.81, 164.81, 196.0, 196.0,
-      130.81, 130.81, 146.83, 146.83,
-      174.61, 174.61, 196.0, 196.0,
-      130.81, 130.81, 123.47, 123.47,
-    ];
+    const song = songs[currentSongIndex];
 
     bgTimer = window.setInterval(() => {
       const elapsed = Date.now() - bgStartTime;
@@ -214,14 +254,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elapsed >= BG_MUSIC_PLAY_MS) {
         vol = Math.max(0, 1 - (elapsed - BG_MUSIC_PLAY_MS) / BG_MUSIC_FADE_MS);
       }
-      const i = bgStep % lead.length;
-      playTone({ frequency: lead[i], duration: 0.12, volume: 0.03 * vol, type: 'square' });
-      playTone({ frequency: bass[i], duration: 0.18, volume: 0.02 * vol, type: 'triangle' });
+      const i = bgStep % song.lead.length;
+      playTone({ frequency: song.lead[i], duration: 0.12, volume: 0.03 * vol, type: 'square' });
+      playTone({ frequency: song.bass[i], duration: 0.18, volume: 0.02 * vol, type: 'triangle' });
       if (i % 4 === 0) {
-        playTone({ frequency: lead[i] * 2, duration: 0.05, volume: 0.012 * vol, type: 'square', when: 0.04 });
+        playTone({ frequency: song.lead[i] * 2, duration: 0.05, volume: 0.012 * vol, type: 'square', when: 0.04 });
       }
       bgStep += 1;
-    }, 180);
+    }, song.tempo);
 
     setMusicState(true);
   }
@@ -234,6 +274,17 @@ document.addEventListener('DOMContentLoaded', () => {
     setMusicState(false);
   }
 
+  function switchSong(direction) {
+    const wasPlaying = musicPlaying;
+    stopBgMusic();
+    bgStep = 0;
+    currentSongIndex = (currentSongIndex + direction + songs.length) % songs.length;
+    updateSongDisplay();
+    if (wasPlaying) {
+      startBgMusic();
+    }
+  }
+
   /** Resume music, play for 5 seconds at full volume, then fade out and stop */
   const RESUME_PLAY_MS = 5000;
   const RESUME_FADE_MS = 3000;
@@ -243,18 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ensureAudioContext();
     bgStartTime = Date.now();
 
-    const lead = [
-      659.25, 783.99, 987.77, 783.99,
-      659.25, 587.33, 523.25, 587.33,
-      659.25, 783.99, 880.0, 783.99,
-      659.25, 587.33, 523.25, 493.88,
-    ];
-    const bass = [
-      164.81, 164.81, 196.0, 196.0,
-      130.81, 130.81, 146.83, 146.83,
-      174.61, 174.61, 196.0, 196.0,
-      130.81, 130.81, 123.47, 123.47,
-    ];
+    const song = songs[currentSongIndex];
 
     bgStep = 0;
     bgTimer = window.setInterval(() => {
@@ -267,14 +307,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elapsed >= RESUME_PLAY_MS) {
         vol = Math.max(0, 1 - (elapsed - RESUME_PLAY_MS) / RESUME_FADE_MS);
       }
-      const i = bgStep % lead.length;
-      playTone({ frequency: lead[i], duration: 0.12, volume: 0.03 * vol, type: 'square' });
-      playTone({ frequency: bass[i], duration: 0.18, volume: 0.02 * vol, type: 'triangle' });
+      const i = bgStep % song.lead.length;
+      playTone({ frequency: song.lead[i], duration: 0.12, volume: 0.03 * vol, type: 'square' });
+      playTone({ frequency: song.bass[i], duration: 0.18, volume: 0.02 * vol, type: 'triangle' });
       if (i % 4 === 0) {
-        playTone({ frequency: lead[i] * 2, duration: 0.05, volume: 0.012 * vol, type: 'square', when: 0.04 });
+        playTone({ frequency: song.lead[i] * 2, duration: 0.05, volume: 0.012 * vol, type: 'square', when: 0.04 });
       }
       bgStep += 1;
-    }, 180);
+    }, song.tempo);
 
     setMusicState(true);
   }
@@ -287,11 +327,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ---------- 3. Cat Pet ---------- */
+  musicPrev?.addEventListener('click', () => switchSong(-1));
+  musicNext?.addEventListener('click', () => switchSong(1));
+
+  /* ---------- 3. Cat Pet (random kaomoji) ---------- */
+  const catFaces = [
+    '(=^･ω･^=)', '(=^˃ᴗ˂^=)', '(=^˶ᵕ˶^=)', '(=^`ω´^=)',
+    'ฅ(•ㅅ•❀)ฅ', 'ฅ(=✧ω✧=)ฅ', 'ฅ(๑•̀ω•́๑)ฅ', 'ฅ(^◕ᴥ◕^)ฅ',
+    '/ᐠ˵• ⩊ •˵ᐟ\\', '/ᐠ˶>⩊<˶ᐟ\\', '/ᐠ˶•ᵕ•˶ᐟ\\',
+    '(^=◕ᴥ◕=^)', '(=^･ｪ･^=)', '(=⁎˃ᴗ˂⁎=)', '(=^･ﻌ･^=)',
+    '(=✪ ﻌ ✪=)', '(=ↀωↀ=)', '(=◕ᴥ◕=)', '(=⚈ω⚈=)',
+  ];
   const catNormal = '(=^･ω･^=)';
-  const catHappy = '(=^˃ᴗ˂^=)';
-  const catBlush = '(=^˶ᵕ˶^=)';
-  const catAngy = '(=^`ω´^=)';
   const catBarrageFaces = [
     '(=^･ω･^=)', '(=^･ｪ･^=)', '(=①ω①=)', '(=ＴェＴ=)', '(=｀ω´=)', '(=^‥^=)', '(=^-ω-^=)',
     'ฅ(•ㅅ•❀)ฅ', 'ฅ(=✧ω✧=)ฅ', 'ฅ(๑•̀ω•́๑)ฅ', 'ฅ(^◕ᴥ◕^)ฅ', 'ฅ(^ω^ฅ)', 'ฅ(⌯͒• ɪ •⌯͒)ฅ',
@@ -310,11 +357,11 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   let bubbleTimer = null;
-  let catMoodIndex = 0;
-  const catMoodCycle = [catHappy, catBlush, catAngy, catHappy];
+  let lastCatFace = catNormal;
 
   catPet.addEventListener('mouseenter', () => {
-    catArt.textContent = catHappy;
+    const randomFace = catFaces[Math.floor(Math.random() * catFaces.length)];
+    catArt.textContent = randomFace;
   });
 
   catPet.addEventListener('mouseleave', () => {
@@ -322,64 +369,57 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   catPet.addEventListener('click', () => {
+    /* Random different kaomoji each click */
+    let newFace;
+    do {
+      newFace = catFaces[Math.floor(Math.random() * catFaces.length)];
+    } while (newFace === lastCatFace && catFaces.length > 1);
+    lastCatFace = newFace;
+    catArt.textContent = newFace;
+
     const msg = catMessages[Math.floor(Math.random() * catMessages.length)];
     catBubble.textContent = msg;
     catBubble.classList.add('show');
-
-    catArt.textContent = catMoodCycle[catMoodIndex % catMoodCycle.length];
-    catMoodIndex += 1;
-    setTimeout(() => {
-      catArt.textContent = catHappy;
-    }, 550);
 
     clearTimeout(bubbleTimer);
     bubbleTimer = setTimeout(() => {
       catBubble.classList.remove('show');
     }, 2200);
-
-    launchCatBarrage();
   });
 
-  function launchCatBarrage() {
-    const isDesktop = window.matchMedia('(min-width: 901px)').matches;
-    const count = isDesktop ? Math.min(BARRAGE_BULLET_COUNT, 80) : BARRAGE_BULLET_COUNT;
-    const animBlocked = reducedMotion || cssAnimationsBlocked();
+  /* ---------- 4. Cat Tag: Particle Burst ---------- */
+  function triggerCatBurst(originEl) {
+    const rect = originEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const count = 24;
 
     for (let i = 0; i < count; i++) {
-      const bullet = document.createElement('div');
-      bullet.className = 'cat-bullet';
-      bullet.textContent = catBarrageFaces[Math.floor(Math.random() * catBarrageFaces.length)];
-      const topPos = Math.random() * 82 + 6;
-      bullet.style.top = `${topPos}%`;
-      const baseFontSize = isDesktop ? 16 : 13;
-      const fontRange = isDesktop ? 14 : 12;
-      bullet.style.fontSize = `${Math.random() * fontRange + baseFontSize}px`;
+      const particle = document.createElement('div');
+      particle.className = 'cat-burst-particle';
+      particle.textContent = catBarrageFaces[Math.floor(Math.random() * catBarrageFaces.length)];
+      particle.style.left = cx + 'px';
+      particle.style.top = cy + 'px';
+      particle.style.fontSize = (Math.random() * 8 + 11) + 'px';
+      document.body.appendChild(particle);
 
-      const delayMs = Math.random() * 1500;
-      const durationMs = (Math.random() * 2.5 + (isDesktop ? 5 : 3.8)) * 1000;
-      bullet.style.animationDelay = `${delayMs}ms`;
-      bullet.style.animationDuration = `${durationMs}ms`;
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      const distance = Math.random() * 160 + 80;
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance;
+      const duration = Math.random() * 600 + 800;
 
-      /* Fallback for when CSS animations are blocked by plugins */
-      if (animBlocked) {
-        bullet.classList.add('no-anim');
-        bullet.style.animation = 'none';
-        bullet.style.opacity = '0.9';
-        bullet.style.transform = 'translateX(0)';
-        requestAnimationFrame(() => {
-          bullet.style.transitionDelay = `${delayMs}ms`;
-          bullet.style.transitionDuration = `${durationMs}ms`;
-          bullet.style.transform = `translateX(calc(100vw + 250px))`;
-          bullet.style.opacity = '0';
-        });
-      }
+      requestAnimationFrame(() => {
+        particle.style.transition = `transform ${duration}ms ease-out, opacity ${duration}ms ease-out`;
+        particle.style.transform = `translate(${dx}px, ${dy}px) rotate(${Math.random() * 360}deg)`;
+        particle.style.opacity = '0';
+      });
 
-      catBarrage.appendChild(bullet);
-      setTimeout(() => bullet.remove(), durationMs + delayMs + 1000);
+      setTimeout(() => particle.remove(), duration + 50);
     }
   }
 
-  /* ---------- 4. Likes interactions ---------- */
+  /* ---------- 5. Likes interactions ---------- */
   const likeContentMap = {
     music: { title: '♪ 音乐', text: '点下面 4×4 格子，像打击垫一样每格一个不同音色。', pad: true },
     daydream: { title: '☁ 发呆', text: '偶尔发呆是一种充电方式，什么都不做也很好。', special: true },
@@ -394,6 +434,16 @@ document.addEventListener('DOMContentLoaded', () => {
     { n: 'A4', f: 440.00, t: 'sine' }, { n: 'C5', f: 523.25, t: 'sine' }, { n: 'D5', f: 587.33, t: 'sine' }, { n: 'E5', f: 659.25, t: 'triangle' },
     { n: 'G5', f: 783.99, t: 'triangle' }, { n: 'A5', f: 880.00, t: 'triangle' }, { n: 'C6', f: 1046.50, t: 'triangle' }, { n: 'D6', f: 1174.66, t: 'triangle' },
     { n: 'E6', f: 1318.51, t: 'triangle' }, { n: 'G6', f: 1567.98, t: 'triangle' }, { n: 'A6', f: 1760.00, t: 'triangle' }, { n: 'C7', f: 2093.00, t: 'triangle' },
+  ];
+
+  /* Auto-play melodies (pentatonic scale indices into padSounds) */
+  const autoMelodies = [
+    /* Melody 1: gentle ascending */
+    [0,2,3,4, 5,7,8,9, 5,4,3,2, 0,2,4,5],
+    /* Melody 2: playful bounce */
+    [4,5,8,5, 4,3,2,3, 4,5,9,8, 5,4,3,0],
+    /* Melody 3: dreamy */
+    [5,8,9,10, 8,5,4,3, 5,8,10,11, 9,8,5,4],
   ];
 
   function buildMusicPad() {
@@ -423,7 +473,51 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => button.classList.remove('active'), 120);
   });
 
-  /* ---------- 5. Tetris ---------- */
+  /* Auto-play handler */
+  document.querySelectorAll('.auto-play-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const melodyIndex = Number(btn.dataset.melody);
+      if (autoMelodyTimer) {
+        clearInterval(autoMelodyTimer);
+        autoMelodyTimer = null;
+        document.querySelectorAll('.auto-play-btn').forEach(b => b.classList.remove('playing'));
+        if (btn.classList.contains('playing')) {
+          btn.classList.remove('playing');
+          return;
+        }
+      }
+
+      const melody = autoMelodies[melodyIndex];
+      if (!melody) return;
+
+      btn.classList.add('playing');
+      let step = 0;
+      ensureAudioContext();
+
+      autoMelodyTimer = setInterval(() => {
+        if (step >= melody.length) {
+          clearInterval(autoMelodyTimer);
+          autoMelodyTimer = null;
+          btn.classList.remove('playing');
+          return;
+        }
+        const padIndex = melody[step];
+        const sound = padSounds[padIndex];
+        if (sound) {
+          playTone({ frequency: sound.f, duration: 0.3, type: sound.t, volume: 0.06 });
+          /* Highlight the pad cell */
+          const cells = musicPadGrid.querySelectorAll('.music-pad-cell');
+          if (cells[padIndex]) {
+            cells[padIndex].classList.add('active');
+            setTimeout(() => cells[padIndex].classList.remove('active'), 150);
+          }
+        }
+        step++;
+      }, 280);
+    });
+  });
+
+  /* ---------- 6. Tetris ---------- */
   const TETRIS_COLS = 10;
   const TETRIS_ROWS = 16;
   const EMPTY = 0;
@@ -655,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Special interactions
     if (key === 'daydream') { triggerDaydream(); return; }
-    if (key === 'cat') { triggerCatTheme(); return; }
+    if (key === 'cat') { triggerCatBurst(target); return; }
     if (key === 'rain') { toggleRain(); return; }
     if (key === 'sunset') { triggerSunset(); return; }
 
@@ -691,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ---------- 6. Contact flow ---------- */
+  /* ---------- 7. Contact flow ---------- */
   const wrongInputWarnings = [
     '别乱输啦~ (╯°□°)╯',
     '说了是夏夏嘛！(ﾉ｀Д´)ﾉ',
@@ -752,9 +846,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    /* After first punishment: show warning messages with kaomoji.
-       wrongInputCount 2 = first post-punishment error → plain message.
-       wrongInputCount 3+ = subsequent errors → kaomoji messages. */
     contactInput.value = '';
     document.querySelector('#contactInputBlock p').innerHTML = '<strong>输入错误请重新输入</strong>';
     if (wrongInputCount <= 2) {
@@ -793,7 +884,6 @@ document.addEventListener('DOMContentLoaded', () => {
   async function startPunishSequence() {
     punishUsed = true;
 
-    /* Pause music */
     stopBgMusic();
 
     document.body.classList.add('no-scroll');
@@ -804,22 +894,18 @@ document.addEventListener('DOMContentLoaded', () => {
     punishMessage.classList.remove('show', 'flash', 'recovery', 'fade-in-msg', 'fade-out-msg');
     startSharpTone();
 
-    /* Phase 1: Page goes black slowly (~2s) */
     punishOverlay.style.transition = 'background 2s linear';
     punishOverlay.style.background = 'rgba(0,0,0,0.15)';
     await wait(50);
     punishOverlay.style.background = '#000';
     await wait(2200);
 
-    /* Phase 2: Show red "你" then start fast flashing */
     punishMessage.textContent = '你';
     punishMessage.classList.add('show');
     await wait(2000);
 
-    /* Start flashing and adding "！" */
     punishMessage.classList.add('flash');
 
-    /* Calculate how many "！" can fit to edge of screen */
     const testSpan = document.createElement('span');
     testSpan.style.position = 'absolute';
     testSpan.style.visibility = 'hidden';
@@ -846,12 +932,10 @@ document.addEventListener('DOMContentLoaded', () => {
       punishMessage.textContent += '！';
     }
 
-    /* Stop flashing, pause 2.5s before text disappears */
     punishMessage.classList.remove('flash');
     punishMessage.style.opacity = '1';
     await wait(2500);
 
-    /* Text disappears */
     punishMessage.classList.remove('show');
     punishMessage.style.opacity = '';
     await wait(500);
@@ -859,15 +943,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     stopSharpTone();
 
-    /* Phase 3: 30 second black screen — first 20s pure black, then 10s transition */
     await wait(20000);
 
-    /* Phase 4: Slowly transition from black to theme color (over ~10s) */
     punishOverlay.style.transition = 'background 10s ease';
     punishOverlay.style.background = 'var(--bg)';
     await wait(10500);
 
-    /* Phase 5: Show "开个玩笑" then fade out */
     punishMessage.textContent = '开个玩笑';
     punishMessage.classList.add('recovery', 'fade-in-msg');
     await wait(2500);
@@ -876,7 +957,6 @@ document.addEventListener('DOMContentLoaded', () => {
     punishMessage.classList.add('fade-out-msg');
     await wait(1300);
 
-    /* Phase 6: Fade in "是夏夏哦" with confirm button */
     punishMessage.classList.remove('fade-out-msg');
     punishMessage.textContent = '是夏夏哦';
     punishMessage.classList.add('fade-in-msg');
@@ -953,7 +1033,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  /* ---------- 7. Scroll Fade-in Animation ---------- */
+  /* ---------- 8. Scroll Fade-in Animation ---------- */
   function observeFadeIns() {
     const fadeEls = document.querySelectorAll('.fade-in');
     if (!('IntersectionObserver' in window)) {
@@ -976,7 +1056,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fadeEls.forEach(el => observer.observe(el));
   }
 
-  /* ---------- 8. Theme System ---------- */
+  /* ---------- 9. Theme System ---------- */
   const musingsData = {
     morning: [
       { emoji: '☀️', text: '早安，今天的阳光好温柔呢。', date: '清晨' },
@@ -1030,7 +1110,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     resolvedTheme = theme;
     updateMusings(theme);
-    updateThemeSwitcherActive();
+    updateThemeCycleBtn(theme);
+    updateLightOverlays(theme);
+    updateCompanion(theme);
   }
 
   function updateMusings(theme) {
@@ -1046,10 +1128,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function updateThemeSwitcherActive() {
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.theme === currentTheme);
-    });
+  function updateThemeCycleBtn(theme) {
+    if (themeCycleBtn) {
+      themeCycleBtn.textContent = themeIcons[theme] || '☀';
+      themeCycleBtn.title = { morning: '上午', noon: '正午', dusk: '黄昏', night: '夜晚' }[theme] || '切换主题';
+    }
   }
 
   function setTheme(mode, isFromSwitcher) {
@@ -1061,18 +1144,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  document.getElementById('themeSwitcher')?.addEventListener('click', (e) => {
-    const btn = e.target.closest('.theme-btn');
-    if (!btn) return;
-    if (catThemeTimer) {
-      clearTimeout(catThemeTimer);
-      catThemeTimer = null;
-      savedThemeBeforeCat = null;
-    }
-    setTheme(btn.dataset.theme, true);
+  /* Theme cycle button: morning -> noon -> dusk -> night -> morning */
+  themeCycleBtn?.addEventListener('click', () => {
+    const currentIndex = themeOrder.indexOf(resolvedTheme);
+    const nextIndex = (currentIndex + 1) % themeOrder.length;
+    setTheme(themeOrder[nextIndex], true);
   });
 
-  /* ---------- 9. Special Like Interactions ---------- */
+  /* ---------- 10. Light Overlays (morning sunlight, night moonlight) ---------- */
+  function updateLightOverlays(theme) {
+    /* Remove existing light overlays */
+    if (morningLightEl) { morningLightEl.remove(); morningLightEl = null; }
+    if (moonLightEl) { moonLightEl.remove(); moonLightEl = null; }
+
+    if (theme === 'morning') {
+      morningLightEl = document.createElement('div');
+      morningLightEl.className = 'morning-light';
+      document.body.appendChild(morningLightEl);
+    } else if (theme === 'night') {
+      moonLightEl = document.createElement('div');
+      moonLightEl.className = 'moon-light';
+      document.body.appendChild(moonLightEl);
+    }
+  }
+
+  /* ---------- 11. Special Like Interactions ---------- */
   function triggerDaydream() {
     const ddEl = document.createElement('div');
     ddEl.className = 'daydream-overlay';
@@ -1083,20 +1179,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ddEl.classList.add('fade-out');
       setTimeout(() => ddEl.remove(), 800);
     }, 5000);
-  }
-
-  function triggerCatTheme() {
-    if (catThemeTimer) {
-      clearTimeout(catThemeTimer);
-    }
-    savedThemeBeforeCat = currentTheme;
-    applyTheme('cat', false);
-
-    catThemeTimer = setTimeout(() => {
-      catThemeTimer = null;
-      setTheme(savedThemeBeforeCat || 'auto', false);
-      savedThemeBeforeCat = null;
-    }, 30000);
   }
 
   function toggleRain() {
@@ -1113,14 +1195,14 @@ document.addEventListener('DOMContentLoaded', () => {
     rainContainer = document.createElement('div');
     rainContainer.className = 'rain-container';
 
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 80; i++) {
       const drop = document.createElement('div');
       drop.className = 'rain-drop';
       drop.style.left = Math.random() * 100 + '%';
       drop.style.animationDuration = (Math.random() * 0.5 + 0.6) + 's';
       drop.style.animationDelay = (Math.random() * 2) + 's';
       drop.style.height = (Math.random() * 10 + 10) + 'px';
-      drop.style.opacity = String(Math.random() * 0.3 + 0.3);
+      drop.style.opacity = String(Math.random() * 0.3 + 0.4);
       rainContainer.appendChild(drop);
     }
 
@@ -1142,13 +1224,48 @@ document.addEventListener('DOMContentLoaded', () => {
   function removeGoldenLight() {
     goldenLightActive = false;
     const gl = document.getElementById('goldenLight');
-    if (gl) gl.remove();
+    if (gl) {
+      gl.classList.add('fade-out');
+      setTimeout(() => gl.remove(), 900);
+    }
   }
 
   // Initialize theme on load
   setTheme('auto', false);
 
-  /* ---------- 10. Hero Floating Particles ---------- */
+  /* ---------- 12. Companion Widget ---------- */
+  function updateCompanion(theme) {
+    if (!companionFace) return;
+    companionFace.textContent = companionEmojis[theme] || '✿';
+  }
+
+  /* ---------- 13. Mouse Trail Effect ---------- */
+  let trailThrottle = 0;
+  document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - trailThrottle < 50) return;
+    trailThrottle = now;
+
+    const dot = document.createElement('div');
+    dot.className = 'trail-dot';
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+
+    /* Slight random offset for sparkle feel */
+    const ox = (Math.random() - 0.5) * 12;
+    const oy = (Math.random() - 0.5) * 12;
+    dot.style.transform = `translate(${ox}px, ${oy}px)`;
+
+    /* Random size variation */
+    const size = Math.random() * 6 + 4;
+    dot.style.width = size + 'px';
+    dot.style.height = size + 'px';
+
+    document.body.appendChild(dot);
+    setTimeout(() => dot.remove(), 800);
+  });
+
+  /* ---------- 14. Hero Floating Particles ---------- */
   function createParticles() {
     const container = document.getElementById('heroParticles');
     if (!container) return;

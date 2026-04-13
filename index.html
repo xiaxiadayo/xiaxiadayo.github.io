@@ -26,13 +26,9 @@
   <!-- ===== Page Content (circle-reveal animated) ===== -->
   <div id="pageContent" class="page-content">
 
-    <!-- ===== Theme Switcher ===== -->
+    <!-- ===== Theme Switcher (single cycle button) ===== -->
     <div id="themeSwitcher" class="theme-switcher">
-      <button class="theme-btn active" data-theme="auto" title="自动">☼</button>
-      <button class="theme-btn" data-theme="morning" title="上午">🌅</button>
-      <button class="theme-btn" data-theme="noon" title="正午">☀</button>
-      <button class="theme-btn" data-theme="dusk" title="黄昏">🌇</button>
-      <button class="theme-btn" data-theme="night" title="夜晚">🌙</button>
+      <button class="theme-cycle-btn" id="themeCycleBtn" title="切换主题">☀</button>
     </div>
 
     <!-- ===== Hero / Welcome ===== -->
@@ -110,11 +106,13 @@
 
   <!-- ===== Music Player (fixed widget) ===== -->
   <div id="musicPlayer" class="music-player hidden">
+    <button id="musicPrev" class="music-nav-btn" aria-label="上一首" title="上一首">⏮</button>
     <button id="musicToggle" class="music-toggle" aria-label="播放/暂停">
       <span class="music-icon" id="musicIcon">▶</span>
     </button>
+    <button id="musicNext" class="music-nav-btn" aria-label="下一首" title="下一首">⏭</button>
     <div class="music-info">
-      <div class="music-title">8-bit</div>
+      <div class="music-title" id="musicTitle">晨间轻语</div>
       <div class="music-artist">夏夏的小世界</div>
     </div>
     <div class="music-eq" id="musicEq">
@@ -141,6 +139,11 @@
       <div id="musicPadArea" class="music-pad-area hidden">
         <p>4 × 4 音乐格子（点击发声）</p>
         <div id="musicPadGrid" class="music-pad-grid"></div>
+        <div class="auto-play-area">
+          <button class="auto-play-btn" data-melody="0">✨ 旋律 1</button>
+          <button class="auto-play-btn" data-melody="1">🎵 旋律 2</button>
+          <button class="auto-play-btn" data-melody="2">🌸 旋律 3</button>
+        </div>
       </div>
       <div id="gameArea" class="game-area hidden">
         <p>猫猫俄罗斯方块（中空方块）</p>
@@ -178,6 +181,11 @@
   <div id="punishOverlay" class="punish-overlay hidden" aria-hidden="true">
     <div class="punish-message" id="punishMessage"></div>
     <button id="punishConfirm" class="punish-confirm hidden" type="button">确认</button>
+  </div>
+
+  <!-- ===== Dynamic Companion Widget ===== -->
+  <div id="companion" class="companion hidden">
+    <div class="companion-face" id="companionFace">✿</div>
   </div>
 
   <script src="/assets/js/main.js"></script>
