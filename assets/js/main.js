@@ -73,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let autoMelodyTimer = null;
 
   const BARRAGE_BULLET_COUNT = 56;
+  const RAIN_DROP_COUNT = 80;
+  const TRAIL_THROTTLE_MS = 50;
 
   function ensureAudioContext() {
     if (!audioCtx) {
@@ -1195,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     rainContainer = document.createElement('div');
     rainContainer.className = 'rain-container';
 
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < RAIN_DROP_COUNT; i++) {
       const drop = document.createElement('div');
       drop.className = 'rain-drop';
       drop.style.left = Math.random() * 100 + '%';
@@ -1243,7 +1245,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let trailThrottle = 0;
   document.addEventListener('mousemove', (e) => {
     const now = Date.now();
-    if (now - trailThrottle < 50) return;
+    if (now - trailThrottle < TRAIL_THROTTLE_MS) return;
     trailThrottle = now;
 
     const dot = document.createElement('div');
