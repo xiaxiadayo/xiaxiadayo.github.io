@@ -158,18 +158,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const revealDelay = 400;
     const revealDur   = 2000;
 
+    /* Fix: set body background early so it matches page-content bg */
+    document.body.style.background = 'var(--bg)';
+
     const safetyTimer = setTimeout(() => {
       if (overlay.parentNode) overlay.remove();
+      pageContent.style.clipPath = 'none';
+      pageContent.style.visibility = 'visible';
       pageContent.classList.add('revealed');
-      document.body.style.background = 'var(--bg)';
       finishEntry();
     }, revealDelay + revealDur + 600);
 
     setTimeout(() => {
-      /* Fix flicker: fade overlay out instead of instant remove */
-      overlay.style.transition = 'opacity 0.3s ease';
-      overlay.style.opacity = '0';
+      /*
+       * Fix flicker: keep overlay fully opaque as a dark backdrop and
+       * raise page-content above it so the circle clip-path reveals
+       * the page over the dark overlay — no body bg is ever exposed.
+       */
       overlay.style.pointerEvents = 'none';
+      pageContent.style.position = 'relative';
+      pageContent.style.zIndex = '10000'; /* above overlay z-index (9999) */
       pageContent.classList.add('circle-revealing');
       const heroInner = document.querySelector('.hero-inner.fade-in');
       if (heroInner) heroInner.classList.add('visible');
@@ -177,11 +185,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       clearTimeout(safetyTimer);
+      /* Remove overlay first — it is behind page-content (z-index) */
       if (overlay.parentNode) overlay.remove();
-      document.body.style.background = 'var(--bg)';
+      /*
+       * Fix flicker: set final clip-path as inline style BEFORE
+       * removing the animation class so the property never reverts
+       * to the base circle(0%) between frames.
+       */
+      pageContent.style.clipPath = 'none';
+      pageContent.style.visibility = 'visible';
       pageContent.classList.remove('circle-revealing');
       pageContent.classList.add('revealed');
       finishEntry();
+      /* Clean up inline overrides after two rAF ticks so the browser
+         has painted the final state from the class before we remove them */
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          pageContent.style.position = '';
+          pageContent.style.zIndex = '';
+          pageContent.style.clipPath = '';
+          pageContent.style.visibility = '';
+        });
+      });
     }, revealDelay + revealDur + 100);
   }
 
