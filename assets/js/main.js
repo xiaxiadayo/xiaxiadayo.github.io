@@ -54,6 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const BG_MUSIC_PLAY_MS = 20000;
   const BG_MUSIC_FADE_MS = 3000;
 
+  let currentTheme = 'auto';
+  let resolvedTheme = 'noon';
+  let catThemeTimer = null;
+  let savedThemeBeforeCat = null;
+  let rainActive = false;
+  let rainContainer = null;
+  let goldenLightActive = false;
+
   const BARRAGE_BULLET_COUNT = 56;
 
   function ensureAudioContext() {
@@ -152,6 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Overlay and body are nearly the same black — removing is seamless
       if (overlay.parentNode) overlay.remove();
       pageContent.classList.add('circle-revealing');
+      // Trigger hero fade-in immediately as circle reveal starts
+      const heroInner = document.querySelector('.hero-inner.fade-in');
+      if (heroInner) heroInner.classList.add('visible');
     }, revealDelay);
 
     setTimeout(() => {
@@ -371,25 +382,18 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- 4. Likes interactions ---------- */
   const likeContentMap = {
     music: { title: '♪ 音乐', text: '点下面 4×4 格子，像打击垫一样每格一个不同音色。', pad: true },
-    daydream: { title: '☁ 发呆', text: '偶尔发呆是一种充电方式，什么都不做也很好。' },
-    cat: { title: '🐱 猫猫', text: '猫猫是世界级治愈源，看到就会不自觉笑出来。' },
-    rain: { title: '🌧 雨天', text: '雨声像天然白噪音，和心情一起慢慢沉下来。' },
-    sunset: { title: '�� 日落', text: '每次日落颜色都不一样，像今天专属的结尾。' },
+    daydream: { title: '☁ 发呆', text: '偶尔发呆是一种充电方式，什么都不做也很好。', special: true },
+    cat: { title: '🐱 猫猫', text: '猫猫是世界级治愈源，看到就会不自觉笑出来。', special: true },
+    rain: { title: '🌧 雨天', text: '雨声像天然白噪音，和心情一起慢慢沉下来。', special: true },
+    sunset: { title: '🌅 日落', text: '每次日落颜色都不一样，像今天专属的结尾。', special: true },
     game: { title: '🎮 玩游戏', text: '来玩猫猫主题俄罗斯方块吧（中间不填充颜色）。', game: true },
-    travel: { title: '🧳 旅行', text: '喜欢走走停停，收集陌生城市里温柔的小细节。' },
-    movie: { title: '🎬 电影', text: '好电影像一段借来的生命，两个小时很值得。' },
-    photography: { title: '📷 拍照', text: '拍照是为了留住当时那一秒“啊真好”的感觉。' },
-    coding: { title: '💻 写代码', text: '把想法变成可运行的页面，超有成就感。' },
-    nightwalk: { title: '🌃 夜游', text: '夜风很轻的时候，街道会变得像一条慢镜头。' },
-    dessert: { title: '🍰 甜点', text: '甜甜的食物会把坏情绪先按下暂停键。' },
-    stargaze: { title: '✨ 看星星', text: '抬头看星星，会觉得很多事都没那么可怕。' },
   };
 
   const padSounds = [
-    { n: 'C4', f: 261.63, t: 'square' }, { n: 'D4', f: 293.66, t: 'triangle' }, { n: 'E4', f: 329.63, t: 'sawtooth' }, { n: 'G4', f: 392.0, t: 'square' },
-    { n: 'A4', f: 440.0, t: 'triangle' }, { n: 'B4', f: 493.88, t: 'sawtooth' }, { n: 'C5', f: 523.25, t: 'square' }, { n: 'D5', f: 587.33, t: 'triangle' },
-    { n: 'E5', f: 659.25, t: 'sawtooth' }, { n: 'G5', f: 783.99, t: 'square' }, { n: 'A5', f: 880.0, t: 'triangle' }, { n: 'B5', f: 987.77, t: 'sawtooth' },
-    { n: 'C6', f: 1046.5, t: 'square' }, { n: 'D6', f: 1174.66, t: 'triangle' }, { n: 'E6', f: 1318.51, t: 'sawtooth' }, { n: 'G6', f: 1567.98, t: 'square' },
+    { n: 'C4', f: 261.63, t: 'sine' }, { n: 'D4', f: 293.66, t: 'sine' }, { n: 'E4', f: 329.63, t: 'sine' }, { n: 'G4', f: 392.00, t: 'sine' },
+    { n: 'A4', f: 440.00, t: 'sine' }, { n: 'C5', f: 523.25, t: 'sine' }, { n: 'D5', f: 587.33, t: 'sine' }, { n: 'E5', f: 659.25, t: 'triangle' },
+    { n: 'G5', f: 783.99, t: 'triangle' }, { n: 'A5', f: 880.00, t: 'triangle' }, { n: 'C6', f: 1046.50, t: 'triangle' }, { n: 'D6', f: 1174.66, t: 'triangle' },
+    { n: 'E6', f: 1318.51, t: 'triangle' }, { n: 'G6', f: 1567.98, t: 'triangle' }, { n: 'A6', f: 1760.00, t: 'triangle' }, { n: 'C7', f: 2093.00, t: 'triangle' },
   ];
 
   function buildMusicPad() {
@@ -413,8 +417,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const index = Number(button.dataset.padIndex);
     const sound = padSounds[index];
     if (!sound) return;
-    playTone({ frequency: sound.f, duration: 0.2, type: sound.t, volume: 0.06 });
-    playTone({ frequency: sound.f * 2, duration: 0.08, type: 'square', volume: 0.012, when: 0.03 });
+    playTone({ frequency: sound.f, duration: 0.3, type: sound.t, volume: 0.06 });
+    playTone({ frequency: sound.f * 2, duration: 0.1, type: 'sine', volume: 0.006, when: 0.03 });
     button.classList.add('active');
     setTimeout(() => button.classList.remove('active'), 120);
   });
@@ -648,6 +652,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const target = event.target.closest('.like-tag');
     if (!target) return;
     const key = target.dataset.like;
+
+    // Special interactions
+    if (key === 'daydream') { triggerDaydream(); return; }
+    if (key === 'cat') { triggerCatTheme(); return; }
+    if (key === 'rain') { toggleRain(); return; }
+    if (key === 'sunset') { triggerSunset(); return; }
+
     const data = key && likeContentMap[key];
     if (!data) return;
 
@@ -965,7 +976,179 @@ document.addEventListener('DOMContentLoaded', () => {
     fadeEls.forEach(el => observer.observe(el));
   }
 
-  /* ---------- 8. Hero Floating Particles ---------- */
+  /* ---------- 8. Theme System ---------- */
+  const musingsData = {
+    morning: [
+      { emoji: '☀️', text: '早安，今天的阳光好温柔呢。', date: '清晨' },
+      { emoji: '🌿', text: '泡一杯热茶，慢慢醒来。', date: '早起时' },
+      { emoji: '🐦', text: '窗外的小鸟叫得好开心。', date: '上午' },
+      { emoji: '🌸', text: '新的一天，什么都有可能。', date: '出发前' },
+    ],
+    noon: [
+      { emoji: '☁️', text: '今天的天空很蓝，适合什么都不想。', date: '三月的某天' },
+      { emoji: '🌧️', text: '下雨天窝在家里听歌，世界安静了好多。', date: '雨天' },
+      { emoji: '🐱', text: '路边的猫猫对我眨了眨眼，算是打过招呼了吧。', date: '散步时' },
+      { emoji: '🌙', text: '晚安，不管你是谁，希望你也能睡个好觉。', date: '深夜' },
+    ],
+    dusk: [
+      { emoji: '🌅', text: '天边染成了橘红色，好像打翻的果汁。', date: '傍晚' },
+      { emoji: '🍂', text: '风吹过来暖暖的，带着一点点甜。', date: '黄昏时' },
+      { emoji: '🏠', text: '该回家了，今天也辛苦啦。', date: '归途中' },
+      { emoji: '✨', text: '夕阳把影子拉得好长好长。', date: '日落时' },
+    ],
+    night: [
+      { emoji: '🌙', text: '夜晚好安静，适合偷偷想心事。', date: '入夜后' },
+      { emoji: '🌃', text: '远处的灯一闪一闪，像会说话。', date: '深夜' },
+      { emoji: '🧸', text: '抱着被子窝起来，世界就只剩下自己。', date: '睡前' },
+      { emoji: '💫', text: '星星在偷看你呢，晚安。', date: '凌晨' },
+    ],
+  };
+
+  const daydreamTexts = {
+    morning: '什么都不用想，就这样挺好的…',
+    noon: '脑袋放空中… 世界暂停一下下 ☁️',
+    dusk: '看着天边发呆，时间慢一点吧…',
+    night: '嘘，夜晚在轻轻哄你发呆…',
+  };
+
+  function getAutoTheme() {
+    const h = new Date().getHours();
+    if (h >= 6 && h < 12) return 'morning';
+    if (h >= 12 && h < 17) return 'noon';
+    if (h >= 17 && h < 20) return 'dusk';
+    return 'night';
+  }
+
+  function applyTheme(theme, isFromSwitcher) {
+    if (isFromSwitcher && goldenLightActive) {
+      removeGoldenLight();
+    }
+    if (theme === 'noon') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    resolvedTheme = theme;
+    updateMusings(theme);
+    updateThemeSwitcherActive();
+  }
+
+  function updateMusings(theme) {
+    const data = musingsData[theme];
+    if (!data) return;
+    const cards = document.querySelectorAll('.musing-card');
+    cards.forEach((card, i) => {
+      if (data[i]) {
+        card.querySelector('.musing-emoji').textContent = data[i].emoji;
+        card.querySelector('.musing-text').textContent = data[i].text;
+        card.querySelector('.musing-date').textContent = data[i].date;
+      }
+    });
+  }
+
+  function updateThemeSwitcherActive() {
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+    });
+  }
+
+  function setTheme(mode, isFromSwitcher) {
+    currentTheme = mode;
+    if (mode === 'auto') {
+      applyTheme(getAutoTheme(), isFromSwitcher);
+    } else {
+      applyTheme(mode, isFromSwitcher);
+    }
+  }
+
+  document.getElementById('themeSwitcher')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.theme-btn');
+    if (!btn) return;
+    if (catThemeTimer) {
+      clearTimeout(catThemeTimer);
+      catThemeTimer = null;
+      savedThemeBeforeCat = null;
+    }
+    setTheme(btn.dataset.theme, true);
+  });
+
+  /* ---------- 9. Special Like Interactions ---------- */
+  function triggerDaydream() {
+    const ddEl = document.createElement('div');
+    ddEl.className = 'daydream-overlay';
+    ddEl.innerHTML = '<p class="daydream-text">' + (daydreamTexts[resolvedTheme] || daydreamTexts.noon) + '</p>';
+    document.body.appendChild(ddEl);
+
+    setTimeout(() => {
+      ddEl.classList.add('fade-out');
+      setTimeout(() => ddEl.remove(), 800);
+    }, 5000);
+  }
+
+  function triggerCatTheme() {
+    if (catThemeTimer) {
+      clearTimeout(catThemeTimer);
+    }
+    savedThemeBeforeCat = currentTheme;
+    applyTheme('cat', false);
+
+    catThemeTimer = setTimeout(() => {
+      catThemeTimer = null;
+      setTheme(savedThemeBeforeCat || 'auto', false);
+      savedThemeBeforeCat = null;
+    }, 30000);
+  }
+
+  function toggleRain() {
+    if (rainActive) {
+      if (rainContainer) {
+        rainContainer.remove();
+        rainContainer = null;
+      }
+      rainActive = false;
+      return;
+    }
+
+    rainActive = true;
+    rainContainer = document.createElement('div');
+    rainContainer.className = 'rain-container';
+
+    for (let i = 0; i < 60; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'rain-drop';
+      drop.style.left = Math.random() * 100 + '%';
+      drop.style.animationDuration = (Math.random() * 0.5 + 0.6) + 's';
+      drop.style.animationDelay = (Math.random() * 2) + 's';
+      drop.style.height = (Math.random() * 10 + 10) + 'px';
+      drop.style.opacity = String(Math.random() * 0.3 + 0.3);
+      rainContainer.appendChild(drop);
+    }
+
+    document.body.appendChild(rainContainer);
+  }
+
+  function triggerSunset() {
+    setTheme('dusk', false);
+
+    if (!goldenLightActive) {
+      goldenLightActive = true;
+      const gl = document.createElement('div');
+      gl.className = 'golden-light';
+      gl.id = 'goldenLight';
+      document.body.appendChild(gl);
+    }
+  }
+
+  function removeGoldenLight() {
+    goldenLightActive = false;
+    const gl = document.getElementById('goldenLight');
+    if (gl) gl.remove();
+  }
+
+  // Initialize theme on load
+  setTheme('auto', false);
+
+  /* ---------- 10. Hero Floating Particles ---------- */
   function createParticles() {
     const container = document.getElementById('heroParticles');
     if (!container) return;

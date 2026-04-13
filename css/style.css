@@ -24,6 +24,78 @@
   --radius: 14px;
 }
 
+/* ===== Theme: Morning (上午) ===== */
+[data-theme="morning"] {
+  --primary: #7BC8A4;
+  --primary-light: #D4F4E2;
+  --primary-dark: #4A9B7F;
+  --bg: #F0FFF5;
+  --text: #5A7A6B;
+  --text-light: #8AAB9B;
+  --accent: #FFD1A4;
+  --lavender: #E0F0E8;
+}
+[data-theme="morning"] .hero {
+  background: linear-gradient(135deg, #E8FFF0 0%, var(--primary-light) 40%, var(--lavender) 70%, #F0FFF5 100%);
+}
+
+/* ===== Theme: Dusk (黄昏) ===== */
+[data-theme="dusk"] {
+  --primary: #E8976B;
+  --primary-light: #FFE4D4;
+  --primary-dark: #C47045;
+  --bg: #FFF5EE;
+  --text: #7A5A4A;
+  --text-light: #AB8A7A;
+  --accent: #FFB6C1;
+  --lavender: #F4E0D8;
+}
+[data-theme="dusk"] .hero {
+  background: linear-gradient(135deg, #FFE8D8 0%, var(--primary-light) 40%, var(--lavender) 70%, #FFF5EE 100%);
+}
+
+/* ===== Theme: Night (夜晚) ===== */
+[data-theme="night"] {
+  --primary: #7B8CDB;
+  --primary-light: #2A3455;
+  --primary-dark: #9BAAF0;
+  --bg: #121828;
+  --text: #B8C4DC;
+  --text-light: #6878A0;
+  --white: #1E2640;
+  --accent: #D4A0F0;
+  --lavender: #1E2A45;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+[data-theme="night"] .hero {
+  background: linear-gradient(135deg, #0E1420 0%, #1A2240 40%, var(--lavender) 70%, #121828 100%);
+}
+[data-theme="night"] .popup-card { background: #1E2640; }
+[data-theme="night"] .popup-overlay { background: rgba(10, 16, 30, 0.6); }
+[data-theme="night"] .music-player { background: rgba(30, 38, 64, 0.92); }
+[data-theme="night"] .cat-art { background: rgba(30, 38, 64, 0.88); }
+[data-theme="night"] .cat-pet:hover .cat-art { background: rgba(42, 52, 85, 0.9); }
+[data-theme="night"] .music-pad-cell { background: #1a2035; }
+[data-theme="night"] .tetris-board { background: #1a2035; }
+[data-theme="night"] .tetris-cell { border-color: #2A3455; }
+[data-theme="night"] .entry-overlay { background: #0a0a0a; }
+
+/* ===== Theme: Cat (猫猫) ===== */
+[data-theme="cat"] {
+  --primary: #FFB6C1;
+  --primary-light: #FFE4E9;
+  --primary-dark: #E8879B;
+  --bg: #FFF5F7;
+  --text: #8B6B72;
+  --text-light: #BFA1A8;
+  --accent: #FF9BB3;
+  --lavender: #FFE0EC;
+}
+[data-theme="cat"] .hero {
+  background: linear-gradient(135deg, #FFF0F3 0%, var(--primary-light) 40%, var(--lavender) 70%, #FFF5F7 100%);
+}
+
 html { scroll-behavior: smooth; font-size: 16px; }
 
 body {
@@ -920,4 +992,159 @@ img { display: block; max-width: 100%; }
 
 @media (max-width: 400px) {
   .musings-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== Theme Switcher ===== */
+.theme-switcher {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 900;
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid var(--primary-light);
+  border-radius: 50px;
+  padding: 4px 6px;
+  box-shadow: var(--shadow);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+[data-theme="night"] .theme-switcher {
+  background: rgba(30, 38, 64, 0.85);
+}
+
+.theme-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  padding: 0;
+  font-family: inherit;
+}
+
+.theme-btn:hover {
+  background: var(--primary-light);
+}
+
+.theme-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Daydream Overlay ===== */
+.daydream-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.daydream-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.daydream-text {
+  font-size: 1.3rem;
+  color: var(--text);
+  font-weight: 400;
+  text-align: center;
+  padding: 2rem;
+  max-width: 80vw;
+  letter-spacing: 0.05em;
+  line-height: 1.8;
+}
+
+[data-theme="night"] .daydream-overlay {
+  background: rgba(18, 24, 40, 0.5);
+}
+
+/* ===== Rain Effect ===== */
+.rain-container {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.rain-drop {
+  position: absolute;
+  top: -20px;
+  width: 1px;
+  height: 15px;
+  background: linear-gradient(to bottom, transparent, rgba(174, 214, 241, 0.6));
+  animation: rainFall linear infinite;
+}
+
+@keyframes rainFall {
+  0% { transform: translateY(-20px) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh) translateX(-30px); opacity: 0; }
+}
+
+/* ===== Golden Light Streak ===== */
+.golden-light {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.golden-light::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 200, 100, 0.08) 38%,
+    rgba(255, 180, 60, 0.15) 42%,
+    rgba(255, 200, 100, 0.08) 46%,
+    transparent 54%
+  );
+  animation: goldenSweep 3s ease-out forwards;
+}
+
+@keyframes goldenSweep {
+  0% { transform: translateX(-60%) translateY(-20%); }
+  100% { transform: translateX(10%) translateY(10%); }
+}
+
+/* ===== Theme Switcher Responsive ===== */
+@media (max-width: 600px) {
+  .theme-switcher {
+    top: 8px;
+    right: 8px;
+    padding: 3px 4px;
+  }
+  .theme-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
 }
