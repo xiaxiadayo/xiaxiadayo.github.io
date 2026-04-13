@@ -1313,3 +1313,189 @@ document.addEventListener('DOMContentLoaded', () => {
 
   createParticles();
 });
+/* =========================
+ * Final patch: intro + cat + rain + time transition
+ * ========================= */
+
+// ---------- Intro Reveal (stable for mobile + desktop) ----------
+(function initIntroReveal() {
+  const body = document.body;
+  const overlay = document.getElementById('intro-overlay');
+  const content = document.querySelector('.page-content');
+  if (!overlay || !content) return;
+
+  let played = false;
+
+  function finishReveal() {
+    overlay.style.opacity = '0';
+    overlay.style.visibility = 'hidden';
+    overlay.style.pointerEvents = 'none';
+
+    content.classList.remove('circle-revealing');
+    content.classList.add('revealed');
+    content.style.clipPath = 'none';
+    content.style.webkitClipPath = 'none';
+    content.style.opacity = '1';
+  }
+
+  function runIntroReveal() {
+    if (played) return;
+    played = true;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      finishReveal();
+      return;
+    }
+
+    overlay.style.opacity = '1';
+    overlay.style.visibility = 'visible';
+    overlay.style.pointerEvents = 'auto';
+
+    content.classList.remove('revealed');
+    content.classList.remove('circle-revealing');
+    void content.offsetWidth;
+    content.classList.add('circle-revealing');
+
+    const onEnd = () => {
+      content.removeEventListener('animationend', onEnd);
+      finishReveal();
+    };
+    content.addEventListener('animationend', onEnd, { once: true });
+
+    setTimeout(finishReveal, 1400);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runIntroReveal, { once: true });
+  } else {
+    runIntroReveal();
+  }
+})();
+
+// ---------- Time transition helper ----------
+function playTimeTransition() {
+  document.body.classList.add('time-transitioning');
+  setTimeout(() => document.body.classList.remove('time-transitioning'), 560);
+}
+
+(function bindTimeTabs() {
+  const tabs = document.querySelectorAll('[data-time]');
+  if (!tabs.length) return;
+
+  const all = ['time-morning', 'time-noon', 'time-evening', 'time-night'];
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const t = tab.getAttribute('data-time');
+      if (!t) return;
+      document.body.classList.remove(...all);
+      document.body.classList.add(`time-${t}`);
+      playTimeTransition();
+    });
+  });
+})();
+
+// ---------- Cat barrage ----------
+(function initCatBarrage() {
+  const catPet = document.getElementById('cat-pet');
+  const catTag = document.querySelector('[data-tag="cat"]');
+  if (!catPet || !catTag) return;
+
+  let layer = document.getElementById('barrage-layer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'barrage-layer';
+    layer.style.position = 'fixed';
+    layer.style.inset = '0';
+    layer.style.pointerEvents = 'none';
+    layer.style.zIndex = '12000';
+    document.body.appendChild(layer);
+  }
+
+  const texts = ['喵~', 'ฅ^•ﻌ•^ฅ', '喵喵!', '开心一天', '猫猫出击'];
+
+  function spawnOne(x, y, text, angleDeg, distance, duration) {
+    const item = document.createElement('span');
+    item.className = 'cat-barrage-item';
+    item.textContent = text;
+    item.style.left = `${x}px`;
+    item.style.top = `${y}px`;
+
+    const rad = angleDeg * Math.PI / 180;
+    item.style.setProperty('--dx', `${Math.cos(rad) * distance}px`);
+    item.style.setProperty('--dy', `${Math.sin(rad) * distance}px`);
+    item.style.setProperty('--dur', `${duration}ms`);
+
+    layer.appendChild(item);
+    setTimeout(() => item.remove(), duration + 120);
+  }
+
+  catPet.addEventListener('click', () => {
+    const r = catPet.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    for (let i = 0; i < 8; i++) {
+      spawnOne(x, y, texts[i % texts.length], -140 + i * 20, 220, 1100);
+    }
+  });
+
+  catTag.addEventListener('click', () => {
+    const r = catTag.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const count = 16;
+    const distance = 420;
+    const duration = 1500;
+    for (let i = 0; i < count; i++) {
+      spawnOne(x, y, texts[i % texts.length], (360 / count) * i, distance, duration);
+    }
+  });
+})();
+
+// ---------- Rain effect (desktop adapted) ----------
+(function initRainEffect() {
+  const rainTag = document.querySelector('[data-tag="rain"]');
+  if (!rainTag) return;
+
+  let rainLayer = document.getElementById('rain-layer');
+  if (!rainLayer) {
+    rainLayer = document.createElement('div');
+    rainLayer.id = 'rain-layer';
+    document.body.appendChild(rainLayer);
+  }
+
+  function buildRain() {
+    rainLayer.innerHTML = '';
+    const w = window.innerWidth;
+    const count = w >= 1024 ? 140 : w >= 768 ? 90 : 55;
+
+    for (let i = 0; i < count; i++) {
+      const d = document.createElement('i');
+      d.className = 'raindrop';
+      d.style.left = `${Math.random() * 100}vw`;
+      d.style.animationDelay = `${Math.random() * 1.8}s`;
+      d.style.animationDuration = `${0.9 + Math.random() * 0.9}s`;
+      d.style.opacity = `${0.22 + Math.random() * 0.4}`;
+      d.style.height = `${10 + Math.random() * 16}px`;
+      rainLayer.appendChild(d);
+    }
+  }
+
+  function openRain() {
+    buildRain();
+    rainLayer.classList.add('active');
+  }
+
+  function closeRain() {
+    rainLayer.classList.remove('active');
+  }
+
+  rainTag.addEventListener('click', () => {
+    rainLayer.classList.contains('active') ? closeRain() : openRain();
+  });
+
+  window.addEventListener('resize', () => {
+    if (rainLayer.classList.contains('active')) buildRain();
+  });
+})();
